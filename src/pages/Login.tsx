@@ -258,25 +258,27 @@ export default function Login() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    <Button 
-                      onClick={handleConfirmLogin} 
-                      className="w-full h-12 text-base font-semibold gap-2 shadow-md bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <Shield className="h-5 w-5" />
-                      Correct & Proceed
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setStep('credentials');
-                        setVerifiedUser(null);
-                        setNationalId('');
-                      }}
-                      className="w-full h-12 text-base border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
-                    >
-                      Not Me / Wrong Details
-                    </Button>
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex flex-col gap-3">
+                      <Button 
+                        onClick={handleConfirmLogin} 
+                        className="w-full h-12 text-base font-semibold gap-2 shadow-md bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Shield className="h-5 w-5" />
+                        Correct & Proceed
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setStep('credentials');
+                          setVerifiedUser(null);
+                          setNationalId('');
+                        }}
+                        className="w-full h-12 text-base border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
+                      >
+                        Not Me / Wrong Details
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
