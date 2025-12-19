@@ -146,7 +146,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="force-light min-h-screen bg-background">
       <nav className="absolute top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
@@ -447,7 +447,7 @@ const Index = () => {
                       placeholder="Enter KMPDU Number (e.g., KMPDU-2024-00456)"
                       value={verificationNumber}
                       onChange={(e) => setVerificationNumber(e.target.value)}
-                      className="h-12"
+                      className="h-12 bg-transparent"
                     />
                   </div>
                   <Button

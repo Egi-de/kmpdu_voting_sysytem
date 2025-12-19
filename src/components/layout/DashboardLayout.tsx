@@ -9,7 +9,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
-  const [scope, setScope] = useState<'national' | 'branch'>('national');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -19,7 +18,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
         "transition-all duration-300",
         sidebarCollapsed ? "md:pl-20" : "md:pl-64"
       )}>
-        <TopBar title={title} scope={scope} onScopeChange={setScope} />
+        <TopBar title={title} />
         <main className="p-6">{children}</main>
       </div>
     </div>

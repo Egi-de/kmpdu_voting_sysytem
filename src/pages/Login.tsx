@@ -131,7 +131,7 @@ export default function Login() {
   const electionEndDate = new Date('2024-12-05T18:00:00');
 
   return (
-    <div className="min-h-screen flex">
+    <div className="force-light min-h-screen flex">
       {/* Left Panel - Hero */}
       <div className="hidden lg:flex lg:w-1/2 gradient-hero relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tOCAyMGwtOC04aDRWMzZoOHY2aDRsLTggOHptOC0yOGw4IDhoLTRWMjBoLTh2LTZoLTRsOC04eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>

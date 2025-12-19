@@ -1,51 +1,31 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Bell, Search, ChevronDown, Clock } from 'lucide-react';
+import { Bell, Search, Clock, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { CountdownTimer } from '@/components/shared/CountdownTimer';
+import { useTheme } from 'next-themes';
 
 interface TopBarProps {
   title: string;
-  scope: 'national' | 'branch';
-  onScopeChange: (scope: 'national' | 'branch') => void;
 }
 
 import { MobileSidebar } from './MobileSidebar';
 
-export function TopBar({ title, scope, onScopeChange }: TopBarProps) {
+export function TopBar({ title }: TopBarProps) {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const electionEndDate = new Date('2024-12-05T18:00:00');
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center gap-4">
         <MobileSidebar />
         <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-        
-        {/* Scope Selector */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
-              {scope === 'national' ? 'National' : user?.branch}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => onScopeChange('national')}>
-              National
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onScopeChange('branch')}>
-              {user?.branch || 'Branch'}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       <div className="flex items-center gap-4">
@@ -65,10 +45,22 @@ export function TopBar({ title, scope, onScopeChange }: TopBarProps) {
           />
         </div>
 
+        {/* Theme Toggle */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleTheme}
+          className="relative"
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-destructive">
+          <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
             3
           </Badge>
         </Button>

@@ -76,24 +76,6 @@ export default function MemberDashboard() {
             }
           </p>
         </div>
-
-        {/* View Switcher */}
-        <Tabs 
-          value={activeLevel} 
-          onValueChange={(val) => setSelectedLevel(val as 'national' | 'branch')}
-          className="w-full md:w-auto"
-        >
-          <TabsList className="grid w-full grid-cols-2 md:w-[300px]">
-            <TabsTrigger value="national" className="gap-2">
-              <Globe className="h-4 w-4" />
-              National
-            </TabsTrigger>
-            <TabsTrigger value="branch" className="gap-2">
-              <Building className="h-4 w-4" />
-              Branch
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
       {/* Stats Grid */}

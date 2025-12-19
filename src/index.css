@@ -111,6 +111,57 @@
     --sidebar-border: 220 25% 15%;
     --sidebar-ring: 174 60% 50%;
   }
+
+  /* Force light mode variables */
+  .force-light {
+    --background: 210 20% 98%;
+    --foreground: 220 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 12%;
+
+    --primary: 220 65% 25%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 20% 94%;
+    --secondary-foreground: 220 30% 20%;
+
+    --muted: 215 20% 94%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 174 60% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --info: 200 80% 50%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 220 65% 25%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 30% 12%;
+    --sidebar-foreground: 215 20% 85%;
+    --sidebar-primary: 174 60% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 30% 18%;
+    --sidebar-accent-foreground: 215 20% 95%;
+    --sidebar-border: 220 25% 20%;
+    --sidebar-ring: 174 60% 50%;
+  }
 }
 
 @layer base {

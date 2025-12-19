@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { CandidateCard } from '@/components/shared/CandidateCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVoting } from '@/contexts/VotingContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Dialog,
   DialogContent,
@@ -21,10 +36,11 @@ import {
   Lock,
   AlertTriangle,
   Loader2,
-  LogOut
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
+import { Progress } from '@/components/ui/progress';
 
 type VotingPhase = 'national' | 'branch' | 'completed';
 
@@ -44,19 +60,27 @@ export default function Ballot() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [processingSelection, setProcessingSelection] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   // Filter positions based on current phase
   const currentPositions = allPositions.filter(p => {
     if (phase === 'national') return p.type === 'national' && p.status === 'active';
     if (phase === 'branch') return p.type === 'branch' && p.status === 'active' && p.branch === user?.branch;
     return false;
-  }).sort((a, b) => a.title.localeCompare(b.title)); // Ensure consistent order, preferably by priority if available
+  }).sort((a, b) => a.title.localeCompare(b.title));
 
   const currentPosition = currentPositions[currentIndex];
   
-  // Auto-redirect if no positions in this phase (e.g., no active elections)
+  // Reset pagination when position changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [currentIndex]);
+
+  // Auto-redirect if no positions in this phase
   useEffect(() => {
     if (phase !== 'completed' && currentPositions.length === 0 && allPositions.length > 0) {
-      // If we are in national and empty, try branch? Or just finish?
       if (phase === 'national') {
         handlePhaseCompletion();
       } else if (phase === 'branch') {
@@ -110,7 +134,6 @@ export default function Ballot() {
 
       setShowConfirmDialog(false);
       
-      // Send "Email" (Mock)
       toast.success(
         <div>
           <strong>Vote Confirmation</strong>
@@ -142,8 +165,6 @@ export default function Ballot() {
             </div>
         );
       } else {
-        // Interns or Admins might not vote in branch or strictly defined only 'member' does branch
-        // Requirement: "if the user is a member (not an intern)... redirect to branch"
         setPhase('completed');
       }
     } else {
@@ -157,13 +178,7 @@ export default function Ballot() {
     toast.info('Logged out successfully');
   };
 
-  // Filter positions based on current phase
-
   if (phase === 'completed') {
-    // Auto logout or show summary then logout?
-    // Requirement: "Once all voting activities are completed, the user is automatically logged out"
-    // But instant logout might be jarring. Let's show a success screen for 3 seconds then logout.
-    
     return (
       <DashboardLayout title="Voting Complete">
         <div className="max-w-2xl mx-auto text-center py-12 animate-fade-in">
@@ -191,7 +206,6 @@ export default function Ballot() {
     );
   }
 
-  // If no positions found for the phase (and not handled by effect yet)
   if (!currentPosition) {
      return (
         <DashboardLayout title="Ballot">
@@ -202,9 +216,15 @@ export default function Ballot() {
      )
   }
 
+  // Pagination Logic
+  const totalPages = Math.ceil(currentPosition.candidates.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCandidates = currentPosition.candidates.slice(startIndex, endIndex);
+
   return (
     <DashboardLayout title={`${phase === 'national' ? 'National' : 'Branch'} Elections`}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Progress System */}
         <div className="mb-8">
            <div className="flex justify-between items-end mb-2">
@@ -244,28 +264,108 @@ export default function Ballot() {
             </div>
             <CardTitle className="text-3xl">{currentPosition.title}</CardTitle>
             <CardDescription className="text-lg">
-              Select your preferred candidate to proceed
+              Select your preferred candidate from the list below to proceed
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-              {currentPosition.candidates.map((candidate) => (
-                <div key={candidate.id} className="relative group">
-                     {/* Overlay for selection effect */}
-                     <CandidateCard
-                        candidate={candidate}
-                        selectable={!processingSelection}
-                        isSelected={selections[currentPosition.id] === candidate.id}
-                        onSelect={() => handleSelectCandidate(candidate.id)}
-                     />
-                     {processingSelection && selections[currentPosition.id] === candidate.id && (
-                         <div className="absolute inset-0 bg-primary/20 flex items-center justify-center rounded-xl backdrop-blur-[1px] transition-all">
-                             <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                         </div>
-                     )}
-                </div>
-              ))}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[300px]">Candidate</TableHead>
+                    <TableHead>Bio</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
+                    <TableHead className="w-[150px] text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentCandidates.map((candidate) => {
+                    const isSelected = selections[currentPosition.id] === candidate.id;
+                    return (
+                      <TableRow key={candidate.id} className={isSelected ? "bg-primary/5" : ""}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-muted-foreground">
+                              {candidate.photo ? (
+                                <img src={candidate.photo} alt={candidate.name} className="h-full w-full rounded-full object-cover" />
+                              ) : (
+                                <UserIcon className="h-5 w-5" />
+                              )}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-semibold">{candidate.name}</span>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                           <p className="text-muted-foreground text-sm line-clamp-2">{candidate.bio}</p>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end">
+                            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                              Active
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button 
+                            variant={isSelected ? "default" : "outline"}
+                            size="sm"
+                            disabled={processingSelection}
+                            onClick={() => handleSelectCandidate(candidate.id)}
+                            className={isSelected ? "bg-green-600 hover:bg-green-700" : ""}
+                          >
+                            {isSelected ? (
+                              <>
+                                <Check className="mr-2 h-4 w-4" />
+                                Selected
+                              </>
+                            ) : (
+                              "Select"
+                            )}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <PaginationItem key={i + 1}>
+                        <PaginationLink 
+                          isActive={currentPage === i + 1}
+                          onClick={() => setCurrentPage(i + 1)}
+                          className="cursor-pointer"
+                        >
+                          {i + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -323,3 +423,4 @@ export default function Ballot() {
     </DashboardLayout>
   );
 }
+
