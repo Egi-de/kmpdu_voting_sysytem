@@ -22,12 +22,15 @@ import {
   Phone,
   Star,
   Play,
+  Menu,
+  X,
 } from 'lucide-react';
 
 const Index = () => {
   const [verificationNumber, setVerificationNumber] = useState('');
   const [verifiedVoter, setVerifiedVoter] = useState<typeof mockUser | null>(null);
   const [verificationError, setVerificationError] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleVerify = () => {
     setVerificationError('');
@@ -165,12 +168,62 @@ const Index = () => {
                 Contact
               </a>
             </div>
-            <Link to="/login">
-              <Button className="bg-white hover:bg-gray-100 text-[#3B5998] font-semibold px-6 py-2 h-auto rounded-md text-sm">
-                Login
-              </Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/login" className="hidden md:block">
+                <Button className="bg-white hover:bg-gray-100 text-[#3B5998] font-semibold px-10 py-2 h-auto rounded-md text-sm">
+                  Login
+                </Button>
+              </Link>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
+          
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-[#163269] border-t border-white/10">
+              <div className="px-4 py-6 space-y-4">
+                <a
+                  href="#features"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm font-medium text-white hover:text-white/80 transition-colors py-2"
+                >
+                  Features
+                </a>
+                <a
+                  href="#how-it-works"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm font-medium text-white hover:text-white/80 transition-colors py-2"
+                >
+                  How It Works
+                </a>
+                <a
+                  href="#demo"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm font-medium text-white hover:text-white/80 transition-colors py-2"
+                >
+                  Demo
+                </a>
+                <a
+                  href="#contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm font-medium text-white hover:text-white/80 transition-colors py-2"
+                >
+                  Contact
+                </a>
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block pt-2">
+                  <Button className="w-full bg-white hover:bg-gray-100 text-[#3B5998] font-semibold px-10 py-2 h-auto rounded-md text-sm">
+                    Login
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
