@@ -238,14 +238,14 @@ export default function Ballot() {
                </div>
                <div className="text-right">
                    <div className="text-sm font-medium text-primary">
-                       Step {currentIndex + 1}/{currentPositions.length}
+                       Step {Object.keys(selections).length}/{currentPositions.length}
                    </div>
                </div>
            </div>
            <div className="h-2 bg-secondary rounded-full overflow-hidden">
                <div 
                    className="h-full bg-primary transition-all duration-500 ease-out"
-                   style={{ width: `${((currentIndex + 1) / currentPositions.length) * 100}%` }}
+                   style={{ width: `${(Object.keys(selections).length / currentPositions.length) * 100}%` }}
                />
            </div>
         </div>
