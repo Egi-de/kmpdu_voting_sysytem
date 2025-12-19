@@ -6,105 +6,126 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, ArrowRight, Loader2, IdCard, Smartphone, RefreshCw } from 'lucide-react';
+import { Shield, ArrowRight, Loader2, IdCard } from 'lucide-react';
 import { CountdownTimer } from '@/components/shared/CountdownTimer';
-import { useToast } from '@/hooks/use-toast';
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@/components/ui/input-otp';
+import { toast } from 'react-toastify';
+import { cn } from '@/lib/utils';
 
-// Mock users database for demo
+// Mock users database with expanded details for verification
 const mockUsersDB = [
-  { memberId: 'KMPDU-2024-00456', password: 'member123', role: 'member' as const, name: 'Dr. Sarah Wanjiku', branch: 'Nairobi Branch', phone: '+254 7** ***456' },
-  { memberId: 'KMPDU-2024-00789', password: 'member123', role: 'member' as const, name: 'Dr. John Mwangi', branch: 'Mombasa Branch', phone: '+254 7** ***789' },
-  { memberId: 'KMPDU-ADM-001', password: 'admin123', role: 'admin' as const, name: 'James Ochieng', branch: 'Headquarters', phone: '+254 7** ***001' },
-  { memberId: 'KMPDU-ADM-002', password: 'admin123', role: 'admin' as const, name: 'Dr. Peter Ochieng', branch: 'National', phone: '+254 7** ***002' },
+  { 
+    memberId: 'KMPDU-2024-00456', 
+    password: '22334455', 
+    role: 'member' as const, 
+    name: 'Dr. Sarah Wanjiku',
+    firstName: 'SARAH',
+    surname: 'WANJIKU',
+    branch: 'Nairobi Branch', 
+    phone: '+254 7** ***456',
+    county: 'NAIROBI',
+    constituency: 'WESTLANDS',
+    ward: 'PARKLANDS',
+    facility: 'AGA KHAN UNIVERSITY HOSPITAL',
+    station: 'MAIN HALL A'
+  },
+  { 
+    memberId: 'KMPDU-2024-00789', 
+    password: '33445566', 
+    role: 'member' as const, 
+    name: 'Dr. John Mwangi',
+    firstName: 'JOHN',
+    surname: 'MWANGI',
+    branch: 'Mombasa Branch', 
+    phone: '+254 7** ***789',
+    county: 'MOMBASA',
+    constituency: 'MVITA',
+    ward: 'TONONOKA',
+    facility: 'COAST GENERAL HOSPITAL',
+    station: 'ADMIN BLOCK B'
+  },
+  { 
+    memberId: 'KMPDU-ADM-001', 
+    password: 'admin123', 
+    role: 'admin' as const, 
+    name: 'James Ochieng', 
+    firstName: 'JAMES',
+    surname: 'OCHIENG',
+    branch: 'Headquarters', 
+    phone: '+254 7** ***001',
+    county: 'NAIROBI',
+    constituency: 'KIBRA',
+    ward: 'WOODLEY',
+    facility: 'KMPDU HQ',
+    station: 'ROOM 1'
+  },
+  { 
+    memberId: 'KMPDU-INT-001', 
+    password: '11223344', 
+    role: 'intern' as const, 
+    name: 'Dr. Intern Jane', 
+    firstName: 'JANE',
+    surname: 'MUTHONI',
+    branch: 'Nairobi Branch', 
+    phone: '+254 7** ***999',
+    county: 'NAIROBI',
+    constituency: 'LANGATA',
+    ward: 'NAIROBI WEST',
+    facility: 'KENYATTA NATIONAL HOSPITAL',
+    station: 'INTERN BLOCK C'
+  },
 ];
 
-type LoginStep = 'credentials' | 'otp';
+type LoginStep = 'credentials' | 'verification';
 
 export default function Login() {
   const [memberId, setMemberId] = useState('');
-  const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<LoginStep>('credentials');
+  const [nationalId, setNationalId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [pendingUser, setPendingUser] = useState<typeof mockUsersDB[0] | null>(null);
+  const [step, setStep] = useState<LoginStep>('credentials');
+  const [verifiedUser, setVerifiedUser] = useState<typeof mockUsersDB[0] | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { toast } = useToast();
 
-  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     // Find user in mock database
     const user = mockUsersDB.find(
-      u => u.memberId.toLowerCase() === memberId.toLowerCase() && u.password === password
+      u => u.memberId.toLowerCase() === memberId.toLowerCase() && u.password === nationalId
     );
 
     if (user) {
-      setPendingUser(user);
-      setStep('otp');
-      toast({
-        title: 'OTP Sent',
-        description: `A verification code has been sent to ${user.phone}`,
-      });
+      setVerifiedUser(user);
+      setStep('verification');
+      toast.success('Identity Verified! Please confirm details.');
     } else {
-      toast({
-        title: 'Login Failed',
-        description: 'Invalid membership number or password. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Identity Verification Failed. Check credentials.');
     }
 
     setIsLoading(false);
   };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length !== 6) return;
+  const handleConfirmLogin = () => {
+    if (!verifiedUser) return;
     
-    setIsLoading(true);
-
-    // Simulate OTP verification delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Mock OTP verification (accept any 6-digit code for demo)
-    if (otp.length === 6 && pendingUser) {
-      login(pendingUser.role);
-      toast({
-        title: `Welcome, ${pendingUser.name}`,
-        description: 'Blockchain verification complete. Redirecting...',
-      });
-      navigate(pendingUser.role === 'admin' ? '/admin' : '/member');
-    } else {
-      toast({
-        title: 'Verification Failed',
-        description: 'Invalid OTP code. Please try again.',
-        variant: 'destructive',
-      });
-    }
-
-    setIsLoading(false);
-  };
-
-  const handleResendOtp = async () => {
-    setIsResending(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast({
-      title: 'OTP Resent',
-      description: `A new verification code has been sent to ${pendingUser?.phone}`,
-    });
-    setIsResending(false);
-  };
-
-  const handleBackToCredentials = () => {
-    setStep('credentials');
-    setOtp('');
-    setPendingUser(null);
+    // Adapt mock user to User interface
+    const userObj = {
+      id: verifiedUser.memberId,
+      name: verifiedUser.name,
+      email: `${verifiedUser.memberId.toLowerCase().replace(/[^a-z0-9]/g, '')}@kmpdu.org`,
+      phone: verifiedUser.phone,
+      role: verifiedUser.role,
+      branch: verifiedUser.branch,
+      memberId: verifiedUser.memberId,
+    };
+    
+    login(userObj);
+    toast.success('Login Successful! Entering voting booth...');
+    navigate(verifiedUser.role === 'admin' ? '/admin' : '/member/ballot');
   };
 
   const electionEndDate = new Date('2024-12-05T18:00:00');
@@ -149,152 +170,123 @@ export default function Login() {
             <Logo />
           </div>
 
-          {step === 'credentials' ? (
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <IdCard className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">Welcome Back</CardTitle>
-                <CardDescription>
-                  Enter your KMPDU membership credentials to continue
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+          <Card className="border-0 shadow-lg overflow-hidden">
+            <CardHeader className="text-center pb-6 bg-secondary/10">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-sm">
+                <IdCard className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-foreground">
+                {step === 'credentials' ? 'Voter Identification' : 'Voter Verified'}
+              </CardTitle>
+              <CardDescription className="text-base">
+                {step === 'credentials' 
+                  ? 'Verify your identity to access the checkbox' 
+                  : 'Please confirm your details below'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-8 px-6 sm:px-8">
+              {step === 'credentials' ? (
+                <form onSubmit={handleVerify} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="memberId">KMPDU Membership Number</Label>
+                    <Label htmlFor="memberId" className="text-base font-medium">KMPDU Member ID</Label>
                     <Input
                       id="memberId"
                       type="text"
-                      placeholder="KMPDU-2024-XXXXX"
+                      placeholder="e.g. KMPDU-2024-XXXXX"
                       value={memberId}
                       onChange={(e) => setMemberId(e.target.value)}
-                      className="h-12 text-lg font-mono"
+                      className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="nationalId" className="text-base font-medium">National ID Number</Label>
                     <Input
-                      id="password"
+                      id="nationalId"
                       type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-12"
+                      placeholder="Enter National ID"
+                      value={nationalId}
+                      onChange={(e) => setNationalId(e.target.value)}
+                      className="h-12 text-lg tracking-widest bg-secondary/5"
                       required
                     />
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full h-12 text-base gap-2"
-                    disabled={isLoading || !memberId || !password}
+                    className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+                    disabled={isLoading || !memberId || !nationalId}
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Verifying...
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Verifying Records...
                       </>
                     ) : (
                       <>
-                        Continue
-                        <ArrowRight className="h-4 w-4" />
+                        Verify Identity
+                        <ArrowRight className="h-5 w-5" />
                       </>
                     )}
                   </Button>
                 </form>
-                
-                <p className="mt-6 text-center text-sm text-muted-foreground">
-                  By signing in, you agree to the election terms and conditions
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <Smartphone className="h-7 w-7 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">Verify Your Identity</CardTitle>
-                <CardDescription>
-                  Enter the 6-digit code sent to {pendingUser?.phone}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleOtpSubmit} className="space-y-6">
-                  <div className="flex justify-center">
-                    <InputOTP
-                      maxLength={6}
-                      value={otp}
-                      onChange={(value) => setOtp(value)}
+              ) : (
+                <div className="space-y-6">
+                  {/* Detailed Table */}
+                  <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+                    <div className="grid grid-cols-1 divide-y">
+                      {[
+                        { label: 'First Name', value: verifiedUser?.firstName },
+                        { label: 'Surname', value: verifiedUser?.surname },
+                        { label: 'County Name', value: verifiedUser?.county },
+                        { label: 'Constituency', value: verifiedUser?.constituency },
+                        { label: 'Ward Name', value: verifiedUser?.ward },
+                        { label: 'Facility', value: verifiedUser?.facility },
+                        { label: 'Polling Station', value: verifiedUser?.station },
+                      ].map((item, index) => (
+                        <div key={item.label} className={cn(
+                          "flex flex-col sm:flex-row sm:items-center",
+                          index % 2 === 0 ? "bg-secondary/5" : "bg-white"
+                        )}>
+                          <div className="px-4 py-2 sm:w-1/3 text-sm font-medium text-muted-foreground sm:border-r">
+                            {item.label}:
+                          </div>
+                          <div className="px-4 py-2 sm:w-2/3 text-sm font-bold text-foreground">
+                            {item.value}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Button 
+                      onClick={handleConfirmLogin} 
+                      className="w-full h-12 text-base font-semibold gap-2 shadow-md bg-green-600 hover:bg-green-700 text-white"
                     >
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                      </InputOTPGroup>
-                      <InputOTPSeparator />
-                      <InputOTPGroup>
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
+                      <Shield className="h-5 w-5" />
+                      Correct & Proceed
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setStep('credentials');
+                        setVerifiedUser(null);
+                        setNationalId('');
+                      }}
+                      className="w-full h-12 text-base border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
+                    >
+                      Not Me / Wrong Details
+                    </Button>
                   </div>
-
-                  <div className="p-3 rounded-lg bg-accent/50 border border-accent flex items-center gap-2 text-sm">
-                    <Shield className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-muted-foreground">
-                      Blockchain-verified authentication ensures your vote integrity
-                    </span>
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-base gap-2"
-                    disabled={isLoading || otp.length !== 6}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      <>
-                        Verify & Sign In
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </form>
-
-                <div className="mt-6 flex flex-col gap-3">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="gap-2"
-                    onClick={handleResendOtp}
-                    disabled={isResending}
-                  >
-                    {isResending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="h-4 w-4" />
-                    )}
-                    Resend Code
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleBackToCredentials}
-                  >
-                    Back to Login
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+              
+              <p className="mt-8 text-center text-xs text-muted-foreground">
+                Protected by end-to-end encryption. <br/>
+                KMPDU Electoral Commission © 2024
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

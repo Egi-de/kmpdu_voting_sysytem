@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -30,16 +29,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -54,20 +43,15 @@ import {
   UserPlus,
   Users,
   IdCard,
-  Phone,
-  Building,
   Eye,
   EyeOff,
   Copy,
   Check,
   RefreshCw,
-  Mail,
   Clock,
-  Send
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'react-toastify';
 import { mockBranches } from '@/data/mockData';
-import { EmailConfirmationDialog } from '@/components/admin/EmailConfirmationDialog';
 
 interface SystemUser {
   id: string;
@@ -157,8 +141,7 @@ export default function AdminUsers() {
   const [generatedMemberId, setGeneratedMemberId] = useState('');
   const [showEmailConfirmDialog, setShowEmailConfirmDialog] = useState(false);
   const [pendingRegistration, setPendingRegistration] = useState<PendingRegistration | null>(null);
-  const { toast } = useToast();
-
+  
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -189,29 +172,20 @@ export default function AdminUsers() {
   const regenerateCredentials = () => {
     generateMemberId();
     generatePassword();
-    toast({
-      title: "Credentials Regenerated",
-      description: "New membership number and password have been generated.",
-    });
+    toast.success("Credentials Regenerated: New membership number and password.");
   };
 
   const copyToClipboard = (text: string, type: 'memberId' | 'password') => {
     navigator.clipboard.writeText(text);
     setCopiedCredentials(type);
     setTimeout(() => setCopiedCredentials(null), 2000);
-    toast({
-      title: type === 'memberId' ? "Membership Number Copied" : "Password Copied",
-      description: "Copied to clipboard.",
-    });
+    toast.info(`${type === 'memberId' ? "Membership Number" : "Password"} Copied to clipboard.`);
   };
 
   const copyAllCredentials = () => {
     const credentials = `KMPDU Membership Credentials\n\nMembership Number: ${generatedMemberId}\nTemporary Password: ${generatedPassword}\n\nPlease change your password after first login.`;
     navigator.clipboard.writeText(credentials);
-    toast({
-      title: "All Credentials Copied",
-      description: "Membership number and password copied to clipboard.",
-    });
+    toast.info("All Credentials Copied to clipboard.");
   };
 
   const filteredUsers = users.filter((user) => {
@@ -267,10 +241,7 @@ export default function AdminUsers() {
         u.id === selectedUser.id ? { ...u, ...formData } : u
       )
     );
-    toast({
-      title: "Member Updated",
-      description: `${formData.name}'s information has been updated.`,
-    });
+    toast.success(`Member Updated: ${formData.name}'s information has been updated.`);
     setIsEditDialogOpen(false);
     resetForm();
   };
@@ -278,11 +249,7 @@ export default function AdminUsers() {
   const handleDeleteUser = () => {
     if (!selectedUser) return;
     setUsers(users.filter((u) => u.id !== selectedUser.id));
-    toast({
-      title: "Member Deleted",
-      description: `${selectedUser.name} has been removed from the system.`,
-      variant: "destructive",
-    });
+    toast.error(`Member Deleted: ${selectedUser.name} has been removed from the system.`);
     setIsDeleteDialogOpen(false);
     setSelectedUser(null);
   };
@@ -798,36 +765,6 @@ export default function AdminUsers() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        {/* Delete Confirmation Dialog */}
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete Member</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to delete <strong>{selectedUser?.name}</strong>? 
-                This action cannot be undone and will remove all their voting records.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteUser}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                Delete Member
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Email Confirmation Dialog */}
-        <EmailConfirmationDialog
-          open={showEmailConfirmDialog}
-          onOpenChange={setShowEmailConfirmDialog}
-          registration={pendingRegistration}
-          onConfirmSend={handleEmailConfirmationSent}
-        />
       </div>
     </DashboardLayout>
   );

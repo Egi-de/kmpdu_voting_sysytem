@@ -16,8 +16,6 @@ import {
   UserCog,
   LogOut,
   ChevronLeft,
-  Globe,
-  ArrowLeftRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -25,7 +23,6 @@ import { useState } from 'react';
 const memberNavItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/member' },
   { icon: Vote, label: 'Ballot', path: '/member/ballot' },
-  { icon: BarChart3, label: 'Live Results', path: '/member/results' },
   { icon: Bell, label: 'Notifications', path: '/member/notifications' },
   { icon: Settings, label: 'Settings', path: '/member/settings' },
 ];
@@ -41,33 +38,34 @@ const adminNavItems = [
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
-export function AppSidebar() {
+interface SidebarContentProps {
+  collapsed?: boolean;
+  onCollapse?: (collapsed: boolean) => void;
+  isMobile?: boolean; // New prop to handle mobile specific styling adjustments
+}
+
+export function SidebarContent({ collapsed, onCollapse, isMobile = false }: SidebarContentProps) {
   const { user, logout, switchRole } = useAuth();
   const { selectedLevel, setSelectedLevel, hasSelectedLevel } = useVoting();
-  const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
-
+  
   const navItems = user?.role === 'admin' ? adminNavItems : memberNavItems;
   const isMember = user?.role === 'member';
 
   return (
-    <aside 
-      className={cn(
-        "fixed left-0 top-0 z-40 flex h-screen flex-col bg-[#1a2332] text-white transition-all duration-300",
-        collapsed ? "w-20" : "w-64"
-      )}
-    >
+    <>
       {/* Header */}
-      <div className="flex h-20 items-center justify-between px-4 border-b border-white/10">
-        {!collapsed && <Logo variant="light" />}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/10 ml-auto"
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          <ChevronLeft className={cn('h-5 w-5 transition-transform', collapsed && 'rotate-180')} />
-        </Button>
+      <div className="flex h-20 items-center justify-between px-4 border-b border-white/10 shrink-0">
+        {(!collapsed || isMobile) && <Logo variant="light" />}
+        {!isMobile && onCollapse && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/10 ml-auto"
+            onClick={() => onCollapse(!collapsed)}
+          >
+            <ChevronLeft className={cn('h-5 w-5 transition-transform', collapsed && 'rotate-180')} />
+          </Button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -80,7 +78,7 @@ export function AppSidebar() {
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all',
-                    collapsed && 'justify-center px-2',
+                    (collapsed && !isMobile) && 'justify-center px-2',
                     isActive
                       ? 'bg-[#2dd4bf] text-white shadow-lg'
                       : 'text-gray-300 hover:bg-white/5 hover:text-white'
@@ -88,7 +86,7 @@ export function AppSidebar() {
                 }
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
+                {(!collapsed || isMobile) && <span>{item.label}</span>}
               </NavLink>
             </li>
           ))}
@@ -96,18 +94,18 @@ export function AppSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 shrink-0">
         {/* Level Switch for Members */}
         {isMember && hasSelectedLevel && (
           <Button
             className={cn(
               "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
-              collapsed ? "px-2 justify-center" : "justify-start"
+              (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
             )}
             onClick={() => setSelectedLevel(selectedLevel === 'national' ? 'branch' : 'national')}
           >
-            <ClipboardList className={cn("h-5 w-5", !collapsed && "mr-3")} />
-            {!collapsed && `Switch to ${selectedLevel === 'national' ? 'Branch' : 'National'}`}
+            <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
+            {(!collapsed || isMobile) && `Switch to ${selectedLevel === 'national' ? 'Branch' : 'National'}`}
           </Button>
         )}
 
@@ -116,12 +114,12 @@ export function AppSidebar() {
           <Button
             className={cn(
               "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
-              collapsed ? "px-2 justify-center" : "justify-start"
+              (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
             )}
             onClick={switchRole}
           >
-            <ClipboardList className={cn("h-5 w-5", !collapsed && "mr-3")} />
-            {!collapsed && "Switch to Branch"}
+            <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
+            {(!collapsed || isMobile) && "Switch to Branch"}
           </Button>
         )}
         
@@ -130,14 +128,32 @@ export function AppSidebar() {
           variant="ghost"
           className={cn(
             "w-full text-gray-300 hover:bg-white/5 hover:text-white h-12 rounded-lg font-medium",
-            collapsed ? "px-2 justify-center" : "justify-start"
+            (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
           )}
           onClick={logout}
         >
-          <LogOut className={cn("h-5 w-5", !collapsed && "mr-3")} />
-          {!collapsed && "Logout"}
+          <LogOut className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
+          {(!collapsed || isMobile) && "Logout"}
         </Button>
       </div>
+    </>
+  );
+}
+
+interface AppSidebarProps {
+  collapsed: boolean;
+  onCollapse: (collapsed: boolean) => void;
+}
+
+export function AppSidebar({ collapsed, onCollapse }: AppSidebarProps) {
+  return (
+    <aside 
+      className={cn(
+        "fixed left-0 top-0 z-40 hidden md:flex h-screen flex-col bg-[#1a2332] text-white transition-all duration-300",
+        collapsed ? "w-20" : "w-64"
+      )}
+    >
+      <SidebarContent collapsed={collapsed} onCollapse={onCollapse} />
     </aside>
   );
 }

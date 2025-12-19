@@ -1,5 +1,5 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -11,7 +11,6 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import MemberDashboard from "./pages/member/MemberDashboard";
 import Ballot from "./pages/member/Ballot";
-import Results from "./pages/member/Results";
 import MemberNotifications from "./pages/member/Notifications";
 import MemberSettings from "./pages/member/Settings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -72,14 +71,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute role="member">
             <Ballot />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/member/results"
-        element={
-          <ProtectedRoute role="member">
-            <Results />
           </ProtectedRoute>
         }
       />
@@ -183,8 +174,7 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
+      <ToastContainer position="top-right" theme="colored" />
       <AuthProvider>
         <VotingProvider>
           <BrowserRouter>

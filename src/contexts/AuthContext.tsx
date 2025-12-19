@@ -5,7 +5,7 @@ import { mockUser, mockAdminUser } from '@/data/mockData';
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (role: UserRole) => void;
+  login: (user: User) => void;
   logout: () => void;
   switchRole: () => void;
 }
@@ -15,8 +15,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (role: UserRole) => {
-    setUser(role === 'admin' ? mockAdminUser : mockUser);
+  const login = (userData: User) => {
+    setUser(userData);
   };
 
   const logout = () => {

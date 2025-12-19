@@ -10,11 +10,15 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const [scope, setScope] = useState<'national' | 'branch'>('national');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
-      <AppSidebar />
-      <div className="pl-64 transition-all duration-300">
+      <AppSidebar collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} />
+      <div className={cn(
+        "transition-all duration-300",
+        sidebarCollapsed ? "md:pl-20" : "md:pl-64"
+      )}>
         <TopBar title={title} scope={scope} onScopeChange={setScope} />
         <main className="p-6">{children}</main>
       </div>
