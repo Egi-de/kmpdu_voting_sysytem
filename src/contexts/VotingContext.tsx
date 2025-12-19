@@ -14,6 +14,7 @@ interface VotingContextType {
   // Voting level selection
   selectedLevel: VotingLevel;
   setSelectedLevel: (level: VotingLevel) => void;
+  requestLevelSwitch: (newLevel: VotingLevel) => void;
   hasSelectedLevel: boolean;
   
   // Voting actions
@@ -174,6 +175,37 @@ export function VotingProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Request level switch with confirmation if current phase incomplete
+  const requestLevelSwitch = useCallback((newLevel: VotingLevel) => {
+    if (!newLevel || newLevel === selectedLevel) return;
+
+    // Check if current level has incomplete voting
+    if (selectedLevel) {
+      const currentPositions = positions.filter(p => {
+        if (selectedLevel === 'national') return p.type === 'national' && p.status === 'active';
+        if (selectedLevel === 'branch') return p.type === 'branch' && p.status === 'active' && p.branch === user?.branch;
+        return false;
+      });
+
+      const hasIncompleteVoting = currentPositions.some(p => !hasUserVotedForPosition(p.id));
+
+      if (hasIncompleteVoting) {
+        const levelName = selectedLevel === 'national' ? 'National' : 'Branch';
+        const confirmed = window.confirm(
+          `You have not completed voting in ${levelName} elections.\n\n` +
+          `Are you sure you want to switch? You can return to complete it later.`
+        );
+        
+        if (!confirmed) {
+          return; // User cancelled the switch
+        }
+      }
+    }
+
+    // Proceed with the switch
+    setSelectedLevel(newLevel);
+  }, [selectedLevel, positions, user?.branch, hasUserVotedForPosition]);
+
   return (
     <VotingContext.Provider
       value={{
@@ -183,6 +215,7 @@ export function VotingProvider({ children }: { children: ReactNode }) {
         notifications,
         selectedLevel,
         setSelectedLevel,
+        requestLevelSwitch,
         hasSelectedLevel,
         hasUserVotedForPosition,
         canUserVoteForPosition,

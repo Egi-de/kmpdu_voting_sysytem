@@ -46,7 +46,7 @@ interface SidebarContentProps {
 
 export function SidebarContent({ collapsed, onCollapse, isMobile = false }: SidebarContentProps) {
   const { user, logout, switchRole } = useAuth();
-  const { selectedLevel, setSelectedLevel, hasSelectedLevel } = useVoting();
+  const { selectedLevel, requestLevelSwitch, hasSelectedLevel } = useVoting();
   
   const navItems = user?.role === 'admin' ? adminNavItems : memberNavItems;
   const isMember = user?.role === 'member';
@@ -102,7 +102,7 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
               "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
               (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
             )}
-            onClick={() => setSelectedLevel(selectedLevel === 'national' ? 'branch' : 'national')}
+            onClick={() => requestLevelSwitch(selectedLevel === 'national' ? 'branch' : 'national')}
           >
             <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
             {(!collapsed || isMobile) && `Switch to ${selectedLevel === 'national' ? 'Branch' : 'National'}`}

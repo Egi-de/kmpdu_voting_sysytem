@@ -50,7 +50,8 @@ export default function Ballot() {
   const { 
     positions: allPositions, 
     hasUserVotedForPosition, 
-    castVote 
+    castVote,
+    selectedLevel,
   } = useVoting();
   
   const [phase, setPhase] = useState<VotingPhase>('national');
@@ -73,6 +74,16 @@ export default function Ballot() {
 
   const currentPosition = currentPositions[currentIndex];
   
+  // Sync phase with selectedLevel from context (when user switches via sidebar)
+  useEffect(() => {
+    if (selectedLevel && selectedLevel !== phase && phase !== 'completed') {
+      setPhase(selectedLevel as VotingPhase);
+      setCurrentIndex(0);
+      setSelections({});
+      setCurrentPage(1);
+    }
+  }, [selectedLevel]);
+
   // Reset pagination when position changes
   useEffect(() => {
     setCurrentPage(1);
@@ -155,20 +166,64 @@ export default function Ballot() {
     setSelections({});
     setCurrentIndex(0);
 
-    if (phase === 'national') {
-      if (user?.role === 'member') {
-        setPhase('branch');
-        toast.info(
+    // Check if user has voted in all required phases
+    const nationalPositions = allPositions.filter(p => p.type === 'national' && p.status === 'active');
+    const branchPositions = allPositions.filter(p => p.type === 'branch' && p.status === 'active' && p.branch === user?.branch);
+    
+    const hasVotedAllNational = nationalPositions.every(p => hasUserVotedForPosition(p.id));
+    const hasVotedAllBranch = branchPositions.every(p => hasUserVotedForPosition(p.id));
+
+    // For members, check both national and branch
+    if (user?.role === 'member') {
+      if (!hasVotedAllNational && !hasVotedAllBranch) {
+        // Neither completed - go to national first
+        setPhase('national');
+        if (phase === 'branch') {
+          toast.info(
             <div>
-                <strong>Proceeding to Branch Elections</strong>
-                <p className="text-sm mt-1">You will now vote for your branch positions.</p>
+              <strong>National Elections Pending</strong>
+              <p className="text-sm mt-1">Please complete your national votes before finishing.</p>
             </div>
+          );
+        }
+      } else if (hasVotedAllNational && !hasVotedAllBranch) {
+        // National done, branch pending
+        setPhase('branch');
+        if (phase === 'national') {
+          toast.info(
+            <div>
+              <strong>Proceeding to Branch Elections</strong>
+              <p className="text-sm mt-1">You will now vote for your branch positions.</p>
+            </div>
+          );
+        } else {
+          toast.info(
+            <div>
+              <strong>Branch Elections Pending</strong>
+              <p className="text-sm mt-1">Please complete your branch votes.</p>
+            </div>
+          );
+        }
+      } else if (!hasVotedAllNational && hasVotedAllBranch) {
+        // Branch done, national pending
+        setPhase('national');
+        toast.info(
+          <div>
+            <strong>National Elections Pending</strong>
+            <p className="text-sm mt-1">Please complete your national votes to finish.</p>
+          </div>
         );
       } else {
+        // Both completed
         setPhase('completed');
       }
     } else {
-      setPhase('completed');
+      // For non-members (admin, intern), only check national
+      if (hasVotedAllNational) {
+        setPhase('completed');
+      } else {
+        setPhase('national');
+      }
     }
   };
 
