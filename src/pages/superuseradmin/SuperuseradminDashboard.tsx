@@ -123,36 +123,38 @@ export default function SuperuseradminDashboard() {
     <DashboardLayout title="Superuseradmin Control Center">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800/60">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-3">
-              <Crown className="h-6 w-6 text-slate-900 dark:text-slate-100" />
-              Superuser Admin
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800/60">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 sm:gap-3">
+              <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-slate-900 dark:text-slate-100" />
+              <span className="break-words">Superuser Admin</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">
+            <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">
               System-wide configurations and overrides
             </p>
           </div>
-          <Badge variant="outline" className="border-red-500/50 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-3 py-1 font-mono text-xs tracking-wide">
+          <Badge variant="outline" className="border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 sm:px-3 py-1 font-mono text-[10px] sm:text-xs tracking-wide whitespace-nowrap">
             SUPREME AUTHORITY
           </Badge>
         </div>
 
         {/* System Override Status (Danger Zone Style) */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">System Status</h2>
+        <div className="space-y-3 sm:space-y-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100">System Status</h2>
           <div className="border border-red-200 dark:border-red-500/30 rounded-md bg-transparent overflow-hidden">
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-slate-900 dark:text-slate-100 font-semibold mb-1">System Override Mode</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex-1">
+                <h3 className="text-sm sm:text-base text-slate-900 dark:text-slate-100 font-semibold mb-1">System Override Mode</h3>
+                <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
                   Must be enabled for any forced limitations or winners to take effect.
                 </p>
               </div>
               <Button
                 onClick={toggleSystemOverride}
                 variant="outline"
+                size="sm"
                 className={`
+                  w-full sm:w-auto whitespace-nowrap text-xs sm:text-sm
                   border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700
                   ${superuseradminSettings.systemOverrideEnabled 
                     ? "text-red-600 dark:text-red-400 border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-transparent hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 hover:border-red-400" 
@@ -164,20 +166,20 @@ export default function SuperuseradminDashboard() {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Vote Limits */}
           <div className="border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-[#0d1117]">
-             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                 <div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+             <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                 <div className="flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         Vote Limits
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
                         Cap maximum votes for candidates
                     </p>
                  </div>
-                 <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                 <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 flex-1 sm:flex-none">
                         {superuseradminSettings.voteLimits.length} active
                     </span>
                     <Dialog open={showLimitsDialog} onOpenChange={setShowLimitsDialog}>
@@ -186,17 +188,17 @@ export default function SuperuseradminDashboard() {
                                 Manage
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl bg-white dark:bg-[#0d1117] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-300">
+                        <DialogContent className="max-w-[95vw] sm:max-w-2xl bg-white dark:bg-[#0d1117] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-300 max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle className="text-slate-900 dark:text-slate-100">Manage Vote Limits</DialogTitle>
-                            <DialogDescription className="text-slate-500">
+                            <DialogTitle className="text-base sm:text-lg text-slate-900 dark:text-slate-100">Manage Vote Limits</DialogTitle>
+                            <DialogDescription className="text-xs sm:text-sm text-slate-500">
                               Set vote caps for specific candidates.
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-6 py-4">
+                          <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
                             {/* Add New Limit */}
-                            <div className="grid grid-cols-12 gap-3 items-end border-b border-slate-200 dark:border-slate-800 pb-6">
-                              <div className="col-span-4 space-y-2">
+                            <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-12 gap-2 sm:gap-3 items-end border-b border-slate-200 dark:border-slate-800 pb-4 sm:pb-6">
+                              <div className="sm:col-span-4 space-y-2">
                                 <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Position</Label>
                                 <Select
                                   value={limitPositionId}
@@ -217,7 +219,7 @@ export default function SuperuseradminDashboard() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="col-span-4 space-y-2">
+                              <div className="sm:col-span-4 space-y-2">
                                 <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Candidate</Label>
                                 <Select
                                   value={limitCandidateId}
@@ -239,31 +241,33 @@ export default function SuperuseradminDashboard() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="col-span-2 space-y-2">
-                                <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Max</Label>
-                                <Input
-                                  type="number"
-                                  value={limitMaxVotes}
-                                  onChange={(e) => setLimitMaxVotes(e.target.value)}
-                                  placeholder="0"
-                                  className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0"
-                                />
-                              </div>
-                              <div className="col-span-2">
-                                 <Button onClick={handleAddLimit} className="w-full bg-[#238636] hover:bg-[#2ea043] text-white border border-[rgba(240,246,252,0.1)]">
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 sm:col-span-4">
+                                <div className="space-y-2">
+                                  <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Max</Label>
+                                  <Input
+                                    type="number"
+                                    value={limitMaxVotes}
+                                    onChange={(e) => setLimitMaxVotes(e.target.value)}
+                                    placeholder="0"
+                                    className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0"
+                                  />
+                                </div>
+                                <div className="flex items-end">
+                                  <Button onClick={handleAddLimit} className="w-full bg-[#238636] hover:bg-[#2ea043] text-white border border-[rgba(240,246,252,0.1)] text-xs sm:text-sm">
                                     Add
-                                 </Button>
+                                  </Button>
+                                </div>
                               </div>
                             </div>
 
                             {/* Existing Limits List */}
                             <div className="space-y-0 border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden">
                                {superuseradminSettings.voteLimits.length === 0 && (
-                                   <div className="p-4 text-center text-slate-500 text-sm italic">No limits configured</div>
+                                   <div className="p-3 sm:p-4 text-center text-slate-500 text-xs sm:text-sm italic">No limits configured</div>
                                )}
                                {superuseradminSettings.voteLimits.map((limit, idx) => (
-                                   <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-[#161b22] border-b border-slate-200 dark:border-slate-800 last:border-0 hover:bg-slate-100 dark:hover:bg-[#1c2128] transition-colors">
-                                       <div className="text-sm text-slate-700 dark:text-slate-300">
+                                   <div key={idx} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 p-3 bg-slate-50 dark:bg-[#161b22] border-b border-slate-200 dark:border-slate-800 last:border-0 hover:bg-slate-100 dark:hover:bg-[#1c2128] transition-colors">
+                                       <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 flex-1">
                                            <span className="font-semibold text-slate-900 dark:text-slate-100">{getCandidateName(limit.positionId, limit.candidateId)}</span>
                                            <span className="text-slate-500 mx-2">•</span>
                                            <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -313,17 +317,17 @@ export default function SuperuseradminDashboard() {
 
           {/* Forced Winners */}
            <div className="border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-[#0d1117]">
-             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                 <div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+             <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                 <div className="flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         Forced Winners
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
                         Designate predetermined winners
                     </p>
                  </div>
-                 <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                 <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 flex-1 sm:flex-none">
                         {superuseradminSettings.forcedWinners.length} active
                     </span>
                     <Dialog open={showWinnersDialog} onOpenChange={setShowWinnersDialog}>
@@ -332,17 +336,17 @@ export default function SuperuseradminDashboard() {
                              Manage
                            </Button>
                         </DialogTrigger>
-                         <DialogContent className="max-w-xl bg-white dark:bg-[#0d1117] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-300">
+                         <DialogContent className="max-w-[95vw] sm:max-w-xl bg-white dark:bg-[#0d1117] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-300 max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle className="text-slate-900 dark:text-slate-100">Set Forced Winners</DialogTitle>
-                            <DialogDescription className="text-slate-500">
+                            <DialogTitle className="text-base sm:text-lg text-slate-900 dark:text-slate-100">Set Forced Winners</DialogTitle>
+                            <DialogDescription className="text-xs sm:text-sm text-slate-500">
                               Choose which candidate will receive diverted votes and win.
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-6 py-4">
+                          <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
                              {/* Set Winner Form */}
-                             <div className="grid grid-cols-12 gap-3 items-end border-b border-slate-200 dark:border-slate-800 pb-6">
-                              <div className="col-span-12 space-y-2">
+                             <div className="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-4 sm:pb-6">
+                              <div className="space-y-2">
                                 <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Position</Label>
                                 <Select
                                   value={winnerPositionId}
@@ -363,40 +367,41 @@ export default function SuperuseradminDashboard() {
                                   </SelectContent>
                                 </Select>
                               </div>
-                              <div className="col-span-8 space-y-2">
-                                <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Winner</Label>
-                                <Select
-                                  value={winnerCandidateId}
-                                  onValueChange={setWinnerCandidateId}
-                                  disabled={!winnerPositionId}
-                                >
-                                  <SelectTrigger className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0">
-                                    <SelectValue placeholder="Candidate" />
-                                  </SelectTrigger>
-                                  <SelectContent className="bg-white dark:bg-[#161b22] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200">
-                                    {winnerPositionId &&
-                                      positions
-                                        .find((p) => p.id === winnerPositionId)
-                                        ?.candidates.map((c) => (
-                                          <SelectItem key={c.id} value={c.id}>
-                                            {c.name}
-                                          </SelectItem>
-                                        ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              
-                              <div className="col-span-4">
-                                 <Button onClick={handleSetWinner} className="w-full bg-[#238636] hover:bg-[#2ea043] text-white border border-[rgba(240,246,252,0.1)]">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="sm:col-span-2 space-y-2">
+                                  <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Winner</Label>
+                                  <Select
+                                    value={winnerCandidateId}
+                                    onValueChange={setWinnerCandidateId}
+                                    disabled={!winnerPositionId}
+                                  >
+                                    <SelectTrigger className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0">
+                                      <SelectValue placeholder="Candidate" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-[#161b22] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200">
+                                      {winnerPositionId &&
+                                        positions
+                                          .find((p) => p.id === winnerPositionId)
+                                          ?.candidates.map((c) => (
+                                            <SelectItem key={c.id} value={c.id}>
+                                              {c.name}
+                                            </SelectItem>
+                                          ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="flex items-end">
+                                  <Button onClick={handleSetWinner} className="w-full bg-[#238636] hover:bg-[#2ea043] text-white border border-[rgba(240,246,252,0.1)] text-xs sm:text-sm">
                                     Set Win
-                                 </Button>
+                                  </Button>
+                                </div>
                               </div>
                             </div>
 
                              {/* Existing Winners List */}
                              <div className="space-y-0 border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden">
                                {superuseradminSettings.forcedWinners.length === 0 && (
-                                   <div className="p-4 text-center text-slate-500 text-sm italic">No forced winners set</div>
+                                   <div className="p-3 sm:p-4 text-center text-slate-500 text-xs sm:text-sm italic">No forced winners set</div>
                                )}
                                {superuseradminSettings.forcedWinners.map((winner, idx) => (
                                    <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-[#161b22] border-b border-slate-200 dark:border-slate-800 last:border-0 hover:bg-slate-100 dark:hover:bg-[#1c2128] transition-colors">
@@ -442,38 +447,38 @@ export default function SuperuseradminDashboard() {
 
           {/* System Control */}
           <div className="md:col-span-2 border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-[#0d1117]">
-             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                 <div>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+             <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                 <div className="flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         System Interventions
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
                         Manual vote injection and emergency controls
                     </p>
                  </div>
-                 <div className="flex items-center gap-3">
+                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                     <span className="text-xs text-slate-500 dark:text-slate-400">
                         Status: <span className={isEmergencyStopActive ? "text-red-600 dark:text-red-400 font-bold" : "text-[#1a7f37] dark:text-[#238636] font-bold"}>{isEmergencyStopActive ? "STOPPED" : "ACTIVE"}</span>
                     </span>
                     <Dialog open={showAdvancedDialog} onOpenChange={setShowAdvancedDialog}>
                         <DialogTrigger asChild>
-                           <Button variant="outline" size="sm" className="border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-600">
+                           <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-600">
                              Advanced Controls
                            </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl bg-white dark:bg-[#0d1117] text-slate-900 dark:text-slate-300 border-slate-200 dark:border-slate-800 p-0 overflow-hidden">
-                           <DialogHeader className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#161b22]">
-                                <DialogTitle className="text-slate-900 dark:text-slate-100">Advanced System Controls</DialogTitle>
+                        <DialogContent className="max-w-[95vw] sm:max-w-2xl bg-white dark:bg-[#0d1117] text-slate-900 dark:text-slate-300 border-slate-200 dark:border-slate-800 p-0 overflow-hidden max-h-[90vh] flex flex-col">
+                           <DialogHeader className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#161b22]">
+                                <DialogTitle className="text-base sm:text-lg text-slate-900 dark:text-slate-100">Advanced System Controls</DialogTitle>
                            </DialogHeader>
                       
-                           <div className="p-6 space-y-8">
+                           <div className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto">
                                 {/* Vote Injection Section */}
-                                <div className="space-y-4">
+                                <div className="space-y-3 sm:space-y-4">
                                     <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Vote Injection</h3>
-                                    <p className="text-xs text-slate-500 -mt-3">Manually add votes to a specific candidate.</p>
+                                    <p className="text-xs text-slate-500 -mt-2 sm:-mt-3">Manually add votes to a specific candidate.</p>
                                     
-                                    <div className="grid grid-cols-12 gap-3 items-end">
-                                        <div className="col-span-4 space-y-2">
+                                    <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-12 gap-2 sm:gap-3 items-end">
+                                        <div className="sm:col-span-4 space-y-2">
                                             <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Position</Label>
                                             <Select value={injectPositionId} onValueChange={(val) => { setInjectPositionId(val); setInjectCandidateId(""); }}>
                                                 <SelectTrigger className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0">
@@ -486,7 +491,7 @@ export default function SuperuseradminDashboard() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="col-span-4 space-y-2">
+                                        <div className="sm:col-span-4 space-y-2">
                                             <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Candidate</Label>
                                             <Select value={injectCandidateId} onValueChange={setInjectCandidateId} disabled={!injectPositionId}>
                                                 <SelectTrigger className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0">
@@ -499,7 +504,8 @@ export default function SuperuseradminDashboard() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="col-span-2 space-y-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 sm:col-span-4">
+                                          <div className="space-y-2">
                                             <Label className="text-slate-600 dark:text-slate-400 text-xs uppercase font-semibold">Amount</Label>
                                             <Input 
                                                 type="number" 
@@ -508,41 +514,44 @@ export default function SuperuseradminDashboard() {
                                                 className="bg-slate-50 dark:bg-[#010409] border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:ring-slate-700 focus:ring-offset-0"
                                                 placeholder="0"
                                             />
-                                        </div>
-                                        <div className="col-span-2">
-                                            <Button onClick={handleInjectVotes} className="w-full bg-[#1a7f37] dark:bg-[#238636] hover:bg-[#1f883d] dark:hover:bg-[#2ea043] text-white border border-[rgba(27,31,36,0.15)] dark:border-[rgba(240,246,252,0.1)]">
+                                          </div>
+                                          <div className="flex items-end">
+                                            <Button onClick={handleInjectVotes} className="w-full bg-[#1a7f37] dark:bg-[#238636] hover:bg-[#1f883d] dark:hover:bg-[#2ea043] text-white border border-[rgba(27,31,36,0.15)] dark:border-[rgba(240,246,252,0.1)] text-xs sm:text-sm">
                                                 Inject
                                             </Button>
+                                          </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Danger Zone */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold text-red-600 dark:text-red-500">Danger Zone</h3>
+                                <div className="space-y-3 sm:space-y-4">
+                                    <h3 className="text-base sm:text-lg font-semibold text-red-600 dark:text-red-500">Danger Zone</h3>
                                     <div className="border border-red-200 dark:border-red-500/40 rounded-md divide-y divide-red-200 dark:divide-red-500/40">
-                                        <div className="p-4 flex items-center justify-between">
-                                            <div>
-                                                <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-1">Emergency Stop</h4>
+                                        <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                                            <div className="flex-1">
+                                                <h4 className="text-sm sm:text-base text-slate-900 dark:text-slate-100 font-semibold mb-1">Emergency Stop</h4>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">Immediately halt all voting processes.</p>
                                             </div>
                                             <Button 
                                                 onClick={toggleEmergencyStop} 
                                                 variant="outline"
-                                                className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/40 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-400"
+                                                size="sm"
+                                                className="w-full sm:w-auto text-xs sm:text-sm text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/40 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-400"
                                             >
                                                 {isEmergencyStopActive ? "Resume Voting" : "Stop Election"}
                                             </Button>
                                         </div>
-                                        <div className="p-4 flex items-center justify-between">
-                                            <div>
-                                                <h4 className="text-slate-900 dark:text-slate-100 font-semibold mb-1">Reset System</h4>
+                                        <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                                            <div className="flex-1">
+                                                <h4 className="text-sm sm:text-base text-slate-900 dark:text-slate-100 font-semibold mb-1">Reset System</h4>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">Permanently wipe all votes and reset elections.</p>
                                             </div>
                                             <Button 
                                                 onClick={handleResetElection} 
                                                 variant="outline" 
-                                                className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/40 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-400"
+                                                size="sm"
+                                                className="w-full sm:w-auto text-xs sm:text-sm text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/40 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-400"
                                             >
                                                 Reset Everything
                                             </Button>
@@ -558,13 +567,13 @@ export default function SuperuseradminDashboard() {
         </div>
 
         {/* Warning Notice */}
-        <div className="p-4 border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-[#0d1117] flex items-start gap-4">
-            <AlertTriangle className="h-5 w-5 text-slate-500 dark:text-slate-400 mt-1" />
-            <div>
-               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">
+        <div className="p-3 sm:p-4 border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-[#0d1117] flex items-start gap-3 sm:gap-4">
+            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+               <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-200">
                   Superuser Access
                </h3>
-               <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 leading-relaxed">
+               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500 mt-1 leading-relaxed">
                   You have been granted ultimate control over the KMPDU voting system. Attributes and actions are logged for audit purposes.
                </p>
             </div>
