@@ -115,7 +115,7 @@ export default function Ballot() {
 
   // Reactive Phase Management
   useEffect(() => {
-    if (allPositions.length === 0) return;
+    if (allPositions.length === 0 || isSubmitting) return;
 
     const nationalPositions = allPositions.filter(
       (p) => p.type === "national" && p.status === "active"
@@ -170,6 +170,7 @@ export default function Ballot() {
     user?.branch,
     user?.role,
     hasUserVotedForPosition,
+    isSubmitting,
   ]);
 
   // Sync phase with selectedLevel from context (if user manually switches)
@@ -249,53 +250,6 @@ export default function Ballot() {
 
       setShowConfirmDialog(false);
       setIsEditingFromReview(false);
-
-      // Manually determine and set next phase to ensure reliable transition
-      const nationalPositions = allPositions.filter(
-        (p) => p.type === "national" && p.status === "active"
-      );
-      const branchPositions = allPositions.filter(
-        (p) =>
-          p.type === "branch" &&
-          p.status === "active" &&
-          p.branch === user?.branch
-      );
-
-      const hasVotedAllNational =
-        nationalPositions.length > 0
-          ? nationalPositions.every((p) => hasUserVotedForPosition(p.id))
-          : true;
-      const hasVotedAllBranch =
-        branchPositions.length > 0
-          ? branchPositions.every((p) => hasUserVotedForPosition(p.id))
-          : true;
-
-      let nextPhase: VotingPhase = phase;
-
-      if (user?.role === "member") {
-        if (!hasVotedAllNational) {
-          nextPhase = "national";
-        } else if (!hasVotedAllBranch && branchPositions.length > 0) {
-          nextPhase = "branch";
-          toast.info(
-            <div>
-              <strong>National Stage Complete</strong>
-              <p className="text-sm mt-1">
-                Proceeding to your branch elections.
-              </p>
-            </div>
-          );
-        } else {
-          nextPhase = "completed";
-        }
-      } else {
-        nextPhase = hasVotedAllNational ? "completed" : "national";
-      }
-
-      if (nextPhase !== phase) {
-        setPhase(nextPhase);
-        handlePhaseCompletion();
-      }
     } catch (error) {
       toast.error("Failed to submit votes. Please try again.");
       console.error(error);
@@ -364,10 +318,10 @@ export default function Ballot() {
               <div className="space-y-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-muted-foreground font-bold tracking-wider">
-                    Position Selected
+                    Status
                   </span>
-                  <span className="text-xs sm:text-sm font-semibold truncate">
-                    Secretary General
+                  <span className="text-xs sm:text-sm font-semibold text-success">
+                    All Votes Successfully Cast
                   </span>
                 </div>
 

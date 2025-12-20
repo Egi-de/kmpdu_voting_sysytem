@@ -641,11 +641,14 @@ const Index = () => {
                         {[
                           { label: 'First Name', field: 'firstName' as const, value: isEditMode ? editedVoter?.firstName : verifiedVoter?.firstName },
                           { label: 'Surname', field: 'surname' as const, value: isEditMode ? editedVoter?.surname : verifiedVoter?.surname },
-                          { label: 'County Name', field: 'county' as const, value: isEditMode ? editedVoter?.county : verifiedVoter?.county },
-                          { label: 'Constituency', field: 'constituency' as const, value: isEditMode ? editedVoter?.constituency : verifiedVoter?.constituency },
-                          { label: 'Ward Name', field: 'ward' as const, value: isEditMode ? editedVoter?.ward : verifiedVoter?.ward },
-                          { label: 'Facility', field: 'facility' as const, value: isEditMode ? editedVoter?.facility : verifiedVoter?.facility },
-                          { label: 'Polling Station', field: 'station' as const, value: isEditMode ? editedVoter?.station : verifiedVoter?.station },
+                          { 
+                            label: 'Branch', 
+                            field: 'branch' as const, 
+                            value: verifiedVoter?.role === 'intern' ? 'N/A' : (isEditMode ? editedVoter?.branch : verifiedVoter?.branch) 
+                          },
+                          { label: 'KMPDU Number', field: 'memberId' as const, value: isEditMode ? editedVoter?.memberId : verifiedVoter?.memberId },
+                          { label: 'Phone Number', field: 'phone' as const, value: isEditMode ? editedVoter?.phone : verifiedVoter?.phone },
+                          { label: 'E-mail Address', field: 'email' as const, value: isEditMode ? editedVoter?.email : verifiedVoter?.email },
                         ].map((item, index) => (
                           <div key={item.label} className={`flex flex-col sm:flex-row sm:items-center ${
                             index % 2 === 0 ? "bg-secondary/5" : "bg-white"

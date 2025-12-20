@@ -98,7 +98,7 @@ export default function AdminDashboard() {
           subtitle={`${stats.turnoutPercentage}% turnout`}
         />
         <StatCard
-          title="Inactive Voters"
+          title="Uncast Votes"
           value={(stats.totalVoters - stats.totalVotesCast).toLocaleString()}
           icon={AlertTriangle}
           variant="warning"
