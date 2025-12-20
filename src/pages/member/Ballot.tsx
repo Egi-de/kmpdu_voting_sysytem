@@ -586,9 +586,8 @@ export default function Ballot() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[300px]">Candidate</TableHead>
-                    <TableHead>Bio</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
+                    <TableHead className="w-[250px]">Candidate</TableHead>
+                    <TableHead className="w-[120px] text-center">Status</TableHead>
                     <TableHead className="w-[150px] text-right">
                       Action
                     </TableHead>
@@ -623,13 +622,8 @@ export default function Ballot() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <p className="text-muted-foreground text-sm line-clamp-2">
-                            {candidate.bio}
-                          </p>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end">
+                        <TableCell className="text-center">
+                          <div className="flex justify-center">
                             <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                               Active
                             </span>
@@ -702,9 +696,6 @@ export default function Ballot() {
                             Active
                           </Badge>
                         </div>
-                        <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
-                          {candidate.bio}
-                        </p>
                       </div>
                     </div>
 

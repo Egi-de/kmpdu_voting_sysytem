@@ -182,7 +182,6 @@ function PositionWithCandidates({ position }: { position: Position }) {
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground truncate">{candidate.bio}</p>
             </div>
             <div className="text-right">
               <p className="font-bold">{candidate.percentage.toFixed(1)}%</p>

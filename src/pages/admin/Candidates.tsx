@@ -73,7 +73,7 @@ export default function AdminCandidates() {
 
   // Edit State
   const [editingCandidate, setEditingCandidate] = useState<any>(null);
-  const [formData, setFormData] = useState({ name: '', bio: '', position: '' });
+  const [formData, setFormData] = useState({ name: '', position: '' });
 
   // Delete State
   const [candidateToDelete, setCandidateToDelete] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function AdminCandidates() {
       // Update logic
       setCandidates(prev => prev.map(c => 
         c.id === editingCandidate.id 
-          ? { ...c, name: formData.name, bio: formData.bio, positionId: formData.position }
+          ? { ...c, name: formData.name, positionId: formData.position }
           : c
       ));
       toast.success('Candidate updated successfully');
@@ -115,7 +115,7 @@ export default function AdminCandidates() {
       const newCandidate = {
         id: Math.random().toString(36).substr(2, 9),
         name: formData.name,
-        bio: formData.bio,
+        bio: '',
         position: formData.position,
         positionId: formData.position,
         positionTitle: mockPositions.find(p => p.id === formData.position)?.title || 'Unknown',
@@ -131,7 +131,7 @@ export default function AdminCandidates() {
 
   const openAddDialog = () => {
     setEditingCandidate(null);
-    setFormData({ name: '', bio: '', position: '' });
+    setFormData({ name: '', position: '' });
     setShowAddDialog(true);
   };
 
@@ -139,7 +139,6 @@ export default function AdminCandidates() {
     setEditingCandidate(candidate);
     setFormData({
       name: candidate.name,
-      bio: candidate.bio,
       position: candidate.positionId
     });
     setShowAddDialog(true);
@@ -148,7 +147,7 @@ export default function AdminCandidates() {
   const closeDialog = () => {
     setShowAddDialog(false);
     setEditingCandidate(null);
-    setFormData({ name: '', bio: '', position: '' });
+    setFormData({ name: '', position: '' });
   };
 
   const confirmDelete = () => {
@@ -265,17 +264,6 @@ export default function AdminCandidates() {
                   />
                 </div>
                 <div className="space-y-2 max-sm:space-y-1.5 max-[250px]:space-y-1">
-                  <Label htmlFor="bio" className="max-sm:text-sm max-[250px]:text-xs">Biography</Label>
-                  <Textarea 
-                    id="bio" 
-                    placeholder="Brief description of the candidate..."
-                    rows={3}
-                    value={formData.bio}
-                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                    className="max-sm:text-sm max-sm:placeholder:text-xs max-sm:min-h-[80px] max-[250px]:text-xs max-[250px]:placeholder:text-[10px] max-[250px]:min-h-[60px]"
-                  />
-                </div>
-                <div className="space-y-2 max-sm:space-y-1.5 max-[250px]:space-y-1">
                   <Label htmlFor="photo" className="max-sm:text-sm max-[250px]:text-xs">Photo</Label>
                   <div className="flex items-center gap-4 max-sm:gap-3 max-[250px]:gap-2">
                     <div className="h-20 w-20 max-sm:h-16 max-sm:w-16 max-[250px]:h-12 max-[250px]:w-12 rounded-lg bg-muted flex items-center justify-center">
@@ -370,9 +358,6 @@ export default function AdminCandidates() {
                         </Avatar>
                         <div className="min-w-0">
                           <div className="font-medium max-[250px]:text-[10px]">{candidate.name}</div>
-                          <div className="text-xs text-muted-foreground line-clamp-1 max-w-[200px] max-[250px]:text-[8px]">
-                            {candidate.bio}
-                          </div>
                         </div>
                       </div>
                     </TableCell>

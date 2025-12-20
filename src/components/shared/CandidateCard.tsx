@@ -74,7 +74,6 @@ export function CandidateCard({
         {/* Info */}
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-foreground truncate">{candidate.name}</h4>
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{candidate.bio}</p>
           
           {/* Vote Stats */}
           <div className="mt-3 space-y-2">

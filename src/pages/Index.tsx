@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Logo } from '@/components/shared/Logo';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { mockUser } from '@/data/mockData';
+import { mockUser, mockVoters } from '@/data/mockData';
 import {
   Shield,
   Vote,
@@ -28,6 +28,9 @@ import {
   ChevronUp,
   AlertCircle,
   Send,
+  Edit,
+  Save,
+  Loader2,
 } from 'lucide-react';
 
 const Index = () => {
@@ -38,6 +41,11 @@ const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showSupportForm, setShowSupportForm] = useState(false);
   const [supportReason, setSupportReason] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  
+  // Edit mode states
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedVoter, setEditedVoter] = useState<typeof mockUser | null>(null);
 
   // Handle scroll event to show/hide scroll-to-top button
   useEffect(() => {
@@ -61,24 +69,60 @@ const Index = () => {
     });
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     setVerificationError('');
     setVerifiedVoter(null);
     setShowSupportForm(false);
     setSupportReason('');
+    setIsEditMode(false);
+    setEditedVoter(null);
     
     if (!verificationNumber.trim()) {
       setVerificationError('Please enter your National ID number');
       return;
     }
 
+    // Set loading state
+    setIsVerifying(true);
+
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     // Mock verification - in production this would check against a database
-    // Using '22334455' as the mock National ID for the demo user
-    if (verificationNumber === '22334455') {
-      setVerifiedVoter(mockUser);
+    const foundVoter = mockVoters[verificationNumber];
+    
+    if (foundVoter) {
+      setVerifiedVoter(foundVoter);
+      setEditedVoter(foundVoter);
     } else {
       setVerificationError('No voter found with this National ID number');
     }
+
+    setIsVerifying(false);
+  };
+
+  const handleEditMode = () => {
+    setIsEditMode(true);
+    setEditedVoter(verifiedVoter);
+  };
+
+  const handleSaveChanges = () => {
+    if (!editedVoter) return;
+    
+    // In production, this would update the database
+    setVerifiedVoter(editedVoter);
+    setIsEditMode(false);
+    alert('Voter details updated successfully!');
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditedVoter(verifiedVoter);
+  };
+
+  const handleFieldChange = (field: keyof typeof mockUser, value: string) => {
+    if (!editedVoter) return;
+    setEditedVoter({ ...editedVoter, [field]: value });
   };
 
   const handleSupportSubmit = (e: React.FormEvent) => {
@@ -567,10 +611,20 @@ const Index = () => {
                   </div>
                   <Button
                     onClick={handleVerify}
-                    className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-10 sm:h-12 px-6 sm:px-8 w-full sm:w-auto text-sm sm:text-base"
+                    disabled={isVerifying}
+                    className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-10 sm:h-12 px-6 sm:px-8 w-full sm:w-auto text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Search className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                    Verify
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                        Verify
+                      </>
+                    )}
                   </Button>
                 </div>
 
@@ -585,13 +639,13 @@ const Index = () => {
                     <div className="border rounded-lg overflow-hidden bg-white shadow-sm mb-4">
                       <div className="grid grid-cols-1 divide-y">
                         {[
-                          { label: 'First Name', value: verifiedVoter?.firstName },
-                          { label: 'Surname', value: verifiedVoter?.surname },
-                          { label: 'County Name', value: verifiedVoter?.county },
-                          { label: 'Constituency', value: verifiedVoter?.constituency },
-                          { label: 'Ward Name', value: verifiedVoter?.ward },
-                          { label: 'Facility', value: verifiedVoter?.facility },
-                          { label: 'Polling Station', value: verifiedVoter?.station },
+                          { label: 'First Name', field: 'firstName' as const, value: isEditMode ? editedVoter?.firstName : verifiedVoter?.firstName },
+                          { label: 'Surname', field: 'surname' as const, value: isEditMode ? editedVoter?.surname : verifiedVoter?.surname },
+                          { label: 'County Name', field: 'county' as const, value: isEditMode ? editedVoter?.county : verifiedVoter?.county },
+                          { label: 'Constituency', field: 'constituency' as const, value: isEditMode ? editedVoter?.constituency : verifiedVoter?.constituency },
+                          { label: 'Ward Name', field: 'ward' as const, value: isEditMode ? editedVoter?.ward : verifiedVoter?.ward },
+                          { label: 'Facility', field: 'facility' as const, value: isEditMode ? editedVoter?.facility : verifiedVoter?.facility },
+                          { label: 'Polling Station', field: 'station' as const, value: isEditMode ? editedVoter?.station : verifiedVoter?.station },
                         ].map((item, index) => (
                           <div key={item.label} className={`flex flex-col sm:flex-row sm:items-center ${
                             index % 2 === 0 ? "bg-secondary/5" : "bg-white"
@@ -599,71 +653,60 @@ const Index = () => {
                             <div className="px-3 py-1.5 sm:px-4 sm:py-2 sm:w-1/3 text-xs sm:text-sm font-medium text-muted-foreground sm:border-r break-words">
                               {item.label}:
                             </div>
-                            <div className="px-3 py-1.5 sm:px-4 sm:py-2 sm:w-2/3 text-sm font-bold text-foreground break-words">
-                              {item.value}
+                            <div className="px-3 py-1.5 sm:px-4 sm:py-2 sm:w-2/3 break-words">
+                              {isEditMode ? (
+                                <Input
+                                  value={item.value || ''}
+                                  onChange={(e) => handleFieldChange(item.field, e.target.value)}
+                                  className="h-8 text-sm font-bold bg-white border-gray-300"
+                                />
+                              ) : (
+                                <span className="text-sm font-bold text-foreground">{item.value}</span>
+                              )}
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Support Notification Section */}
+                    {/* Edit Controls Section */}
                     <div className="mt-4">
-                      {!showSupportForm ? (
+                      {!isEditMode ? (
                         <p className="text-[10px] sm:text-sm text-gray-600 text-center flex flex-col sm:block items-center gap-1">
                           <span>Details incorrect?</span>
                           <button
-                            onClick={() => setShowSupportForm(true)}
-                            className="text-[#1e3a8a] text-[10px] sm:text-sm hover:text-[#3b82f6] font-semibold underline inline-flex items-center gap-1 transition-colors"
-                          >
-                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="sm:hidden">Notify Support</span>
-                            <span className="hidden sm:inline">Notify KMPDU Support</span>
+                            onClick={handleEditMode}
+                            className="text-[#1e3a8a] text-[10px] sm:text-sm hover:text-[#3b82f6] font-semibold underline inline-flex items-center gap-1 transition-colors">
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="sm:hidden">Edit Details</span>
+                            <span className="hidden sm:inline">Edit Details Yourself</span>
                           </button>
                         </p>
                       ) : (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 animate-in slide-in-from-top-2">
                           <div className="flex items-center gap-2 mb-3">
-                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
-                            <h4 className="font-semibold text-sm sm:text-base text-[#1e3a8a]">Report Incorrect Details</h4>
+                            <Edit className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
+                            <h4 className="font-semibold text-sm sm:text-base text-[#1e3a8a]">Edit Mode Active</h4>
                           </div>
-                          <form onSubmit={handleSupportSubmit} className="space-y-3">
-                            <div>
-                              <label htmlFor="supportReason" className="text-xs sm:text-sm font-medium text-gray-700 block mb-1">
-                                Please describe what information is incorrect:
-                              </label>
-                              <Textarea
-                                id="supportReason"
-                                value={supportReason}
-                                onChange={(e) => setSupportReason(e.target.value)}
-                                placeholder="E.g., My polling station should be Main Hall B, not Main Hall A..."
-                                className="min-h-[100px] resize-none"
-                                required
-                              />
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-2">
-                              <Button
-                                type="submit"
-                                className="flex-1 bg-[#1e3a8a] hover:bg-[#3b82f6] text-white w-full h-8 sm:h-auto text-xs sm:text-sm"
-                                disabled={!supportReason.trim()}
-                              >
-                                <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                                <span className="sm:hidden">Send</span>
-                                <span className="hidden sm:inline">Send Notification</span>
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                  setShowSupportForm(false);
-                                  setSupportReason('');
-                                }}
-                                className="border-gray-300 w-full sm:w-auto mt-0 sm:mt-0 h-8 sm:h-auto text-xs sm:text-sm"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </form>
+                          <p className="text-xs sm:text-sm text-gray-600 mb-3">
+                            Update the fields above and click Save Changes when done.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <Button
+                              onClick={handleSaveChanges}
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white w-full h-8 sm:h-auto text-xs sm:text-sm">
+                              <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                              <span className="sm:hidden">Save</span>
+                              <span className="hidden sm:inline">Save Changes</span>
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                              className="border-gray-300 w-full sm:w-auto mt-0 sm:mt-0 h-8 sm:h-auto text-xs sm:text-sm">
+                              Cancel
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </div>
