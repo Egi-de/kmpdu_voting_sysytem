@@ -1,4 +1,4 @@
-export type UserRole = 'member' | 'admin' | 'intern';
+export type UserRole = "member" | "admin" | "intern" | "superuseradmin";
 
 export interface User {
   id: string;
@@ -34,12 +34,12 @@ export interface Candidate {
 export interface Position {
   id: string;
   title: string;
-  type: 'national' | 'branch';
+  type: "national" | "branch";
   branch?: string;
   candidates: Candidate[];
   totalVotes: number;
   eligibleVoters: number;
-  status: 'upcoming' | 'active' | 'closed';
+  status: "upcoming" | "active" | "closed";
   startTime: Date;
   endTime: Date;
   winnerId?: string; // Announced winner
@@ -67,7 +67,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   timestamp: Date;
   read: boolean;
 }
@@ -95,7 +95,7 @@ export interface VoteTransaction {
 
 export interface AuditLog {
   id: string;
-  type: 'vote' | 'admin' | 'system' | 'security';
+  type: "vote" | "admin" | "system" | "security";
   action: string;
   timestamp: Date;
   user?: string;
@@ -110,4 +110,24 @@ export interface ElectionSettings {
   blockchainVerificationEnabled: boolean;
   resultsPublished: boolean;
   demoModeEnabled: boolean;
+}
+
+export interface VoteLimit {
+  positionId: string;
+  candidateId: string;
+  maxVotes: number;
+  isActive: boolean;
+}
+
+export interface ForcedWinner {
+  positionId: string;
+  candidateId: string;
+  isActive: boolean;
+  collectRemainingVotes: boolean; // If true, all remaining votes go to this candidate
+}
+
+export interface SuperuseradminSettings {
+  voteLimits: VoteLimit[];
+  forcedWinners: ForcedWinner[];
+  systemOverrideEnabled: boolean;
 }

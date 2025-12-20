@@ -16,6 +16,7 @@ import {
   UserCog,
   LogOut,
   ChevronLeft,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -37,6 +38,11 @@ const adminNavItems = [
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
+const superuserNavItems = [
+  { icon: Crown, label: 'Control Center', path: '/superuseradmin' },
+  ...adminNavItems,
+];
+
 interface SidebarContentProps {
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
@@ -47,7 +53,10 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
   const { user, logout, switchRole } = useAuth();
   const { selectedLevel, requestLevelSwitch, hasSelectedLevel } = useVoting();
   
-  const navItems = user?.role === 'admin' ? adminNavItems : memberNavItems;
+  let navItems = memberNavItems;
+  if (user?.role === 'admin') navItems = adminNavItems;
+  if (user?.role === 'superuseradmin') navItems = superuserNavItems;
+
   const isMember = user?.role === 'member';
 
   return (
