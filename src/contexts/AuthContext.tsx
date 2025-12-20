@@ -13,14 +13,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem('kmpdu_user');
+    return stored ? JSON.parse(stored) : null;
+  });
 
   const login = (userData: User) => {
     setUser(userData);
+    localStorage.setItem('kmpdu_user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('kmpdu_user');
   };
 
   const switchRole = () => {

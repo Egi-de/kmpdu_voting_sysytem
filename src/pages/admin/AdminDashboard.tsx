@@ -22,10 +22,32 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useVoting } from '@/contexts/VotingContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { selectedLevel, setSelectedLevel, positions: allPositions } = useVoting();
   const stats = mockElectionStats;
+
+  // Default to national level if not set
+  useEffect(() => {
+    if (!selectedLevel) {
+      setSelectedLevel('national');
+    }
+  }, [selectedLevel, setSelectedLevel]);
+
+  // Filter positions based on selected level
+  const activeLevel = selectedLevel || 'national';
+  const positions = allPositions.filter(p => {
+    if (activeLevel === 'national') {
+      return p.type === 'national';
+    } else {
+      return p.type === 'branch' && p.branch === user?.branch;
+    }
+  });
 
   return (
     <DashboardLayout title="Admin Dashboard">
@@ -91,45 +113,79 @@ export default function AdminDashboard() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Branch Analytics */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Building className="h-4 w-4 text-accent" />
-                Branch-by-Branch Analytics
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/admin/branches')}>
-                View All
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mockBranches.slice(0, 5).map((branch, index) => (
-                  <div key={branch.id} className="flex items-center gap-4 stagger-enter" style={{ animationDelay: `${index * 50}ms` }}>
-                    <div className="w-32 truncate text-sm font-medium">{branch.name.replace(' Branch', '')}</div>
-                    <div className="flex-1">
-                      <Progress 
-                        value={branch.turnoutPercentage} 
-                        className="h-2"
-                        indicatorClassName={cn(
-                          branch.turnoutPercentage >= 75 ? 'bg-success' :
-                          branch.turnoutPercentage >= 50 ? 'bg-accent' :
-                          'bg-warning'
-                        )}
-                      />
+          {/* Branch Analytics - Only show in National view */}
+          {activeLevel === 'national' && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Building className="h-4 w-4 text-accent" />
+                  Branch-by-Branch Analytics
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/admin/branches')}>
+                  View All
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {mockBranches.slice(0, 5).map((branch, index) => (
+                    <div key={branch.id} className="flex items-center gap-4 stagger-enter" style={{ animationDelay: `${index * 50}ms` }}>
+                      <div className="w-32 truncate text-sm font-medium">{branch.name.replace(' Branch', '')}</div>
+                      <div className="flex-1">
+                        <Progress 
+                          value={branch.turnoutPercentage} 
+                          className="h-2"
+                          indicatorClassName={cn(
+                            branch.turnoutPercentage >= 75 ? 'bg-success' :
+                            branch.turnoutPercentage >= 50 ? 'bg-accent' :
+                            'bg-warning'
+                          )}
+                        />
+                      </div>
+                      <div className="w-20 text-right">
+                        <span className="font-semibold">{branch.turnoutPercentage}%</span>
+                        <span className="text-xs text-muted-foreground ml-1">
+                          ({branch.votedCount.toLocaleString()})
+                        </span>
+                      </div>
                     </div>
-                    <div className="w-20 text-right">
-                      <span className="font-semibold">{branch.turnoutPercentage}%</span>
-                      <span className="text-xs text-muted-foreground ml-1">
-                        ({branch.votedCount.toLocaleString()})
-                      </span>
-                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Branch-specific info - Only show in Branch view */}
+          {activeLevel === 'branch' && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Building className="h-4 w-4 text-accent" />
+                  {user?.branch} Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Branch</span>
+                    <span className="font-medium">{user?.branch}</span>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total Members</span>
+                    <span className="font-semibold">4,520</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Votes Cast</span>
+                    <span className="font-semibold">3,616</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Turnout</span>
+                    <span className="font-semibold text-accent">80%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Positions Overview */}
           <Card>
@@ -141,45 +197,51 @@ export default function AdminDashboard() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                {mockPositions.map((position) => {
-                  const turnout = (position.totalVotes / position.eligibleVoters) * 100;
-                  const leader = position.candidates.reduce((a, b) => 
-                    a.percentage > b.percentage ? a : b
-                  );
-                  return (
-                    <div
-                      key={position.id}
-                      className="rounded-lg border p-4 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => navigate('/admin/results')}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium">{position.title}</h4>
-                        <Badge variant="outline" className={cn(
-                          'text-xs',
-                          position.status === 'active' && 'bg-success/10 text-success border-success/20'
-                        )}>
-                          {position.status === 'active' && (
-                            <span className="mr-1 h-1.5 w-1.5 rounded-full bg-success pulse-live inline-block" />
-                          )}
-                          {position.status}
-                        </Badge>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Leading</span>
-                          <span className="font-medium">{leader.name.split(' ').slice(-1)[0]} ({leader.percentage.toFixed(1)}%)</span>
+              {positions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No {activeLevel} positions found
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {positions.map((position) => {
+                    const turnout = (position.totalVotes / position.eligibleVoters) * 100;
+                    const leader = position.candidates.reduce((a, b) => 
+                      a.percentage > b.percentage ? a : b
+                    );
+                    return (
+                      <div
+                        key={position.id}
+                        className="rounded-lg border p-4 hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => navigate('/admin/results')}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-medium">{position.title}</h4>
+                          <Badge variant="outline" className={cn(
+                            'text-xs',
+                            position.status === 'active' && 'bg-success/10 text-success border-success/20'
+                          )}>
+                            {position.status === 'active' && (
+                              <span className="mr-1 h-1.5 w-1.5 rounded-full bg-success pulse-live inline-block" />
+                            )}
+                            {position.status}
+                          </Badge>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Turnout</span>
-                          <span className="font-medium">{turnout.toFixed(1)}%</span>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Leading</span>
+                            <span className="font-medium">{leader.name.split(' ').slice(-1)[0]} ({leader.percentage.toFixed(1)}%)</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Turnout</span>
+                            <span className="font-medium">{turnout.toFixed(1)}%</span>
+                          </div>
+                          <Progress value={turnout} className="h-1.5" indicatorClassName="bg-accent" />
                         </div>
-                        <Progress value={turnout} className="h-1.5" indicatorClassName="bg-accent" />
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

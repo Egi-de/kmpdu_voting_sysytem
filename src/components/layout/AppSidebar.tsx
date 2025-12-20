@@ -116,10 +116,10 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
               "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
               (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
             )}
-            onClick={switchRole}
+            onClick={() => requestLevelSwitch(selectedLevel === 'branch' ? 'national' : 'branch')}
           >
             <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
-            {(!collapsed || isMobile) && "Switch to Branch"}
+            {(!collapsed || isMobile) && `Switch to ${selectedLevel === 'branch' ? 'National' : 'Branch'}`}
           </Button>
         )}
         

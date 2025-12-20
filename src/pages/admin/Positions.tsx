@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { mockPositions } from '@/data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,10 +44,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useVoting } from '@/contexts/VotingContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminPositions() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const positions = mockPositions;
+  const { user } = useAuth();
+  const { selectedLevel, setSelectedLevel, positions: allPositions } = useVoting();
+
+  // Default to national level if not set
+  useEffect(() => {
+    if (!selectedLevel) {
+      setSelectedLevel('national');
+    }
+  }, [selectedLevel, setSelectedLevel]);
+
+  // Filter positions based on selected level
+  const activeLevel = selectedLevel || 'national';
+  const positions = allPositions.filter(p => {
+    if (activeLevel === 'national') {
+      return p.type === 'national';
+    } else {
+      return p.type === 'branch' && p.branch === user?.branch;
+    }
+  });
 
   const handleCreatePosition = () => {
     setShowCreateDialog(false);

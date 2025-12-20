@@ -99,6 +99,25 @@ export default function Login() {
     );
 
     if (user) {
+      // If user is admin, bypass verification step
+      if (user.role === 'admin') {
+        const userObj = {
+          id: user.memberId,
+          name: user.name,
+          email: `${user.memberId.toLowerCase().replace(/[^a-z0-9]/g, '')}@kmpdu.org`,
+          phone: user.phone,
+          role: user.role,
+          branch: user.branch,
+          memberId: user.memberId,
+        };
+        
+        login(userObj);
+        toast.success('Admin Login Successful!');
+        navigate('/admin');
+        setIsLoading(false);
+        return;
+      }
+
       setVerifiedUser(user);
       setStep('verification');
       toast.success('Identity Verified! Please confirm details.');

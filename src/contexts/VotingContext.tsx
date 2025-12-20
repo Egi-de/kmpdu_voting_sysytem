@@ -179,7 +179,13 @@ export function VotingProvider({ children }: { children: ReactNode }) {
   const requestLevelSwitch = useCallback((newLevel: VotingLevel) => {
     if (!newLevel || newLevel === selectedLevel) return;
 
-    // Check if current level has incomplete voting
+    // Skip voting completion check for admins (they are not voters)
+    if (user?.role === 'admin') {
+      setSelectedLevel(newLevel);
+      return;
+    }
+
+    // Check if current level has incomplete voting (for members only)
     if (selectedLevel) {
       const currentPositions = positions.filter(p => {
         if (selectedLevel === 'national') return p.type === 'national' && p.status === 'active';
@@ -204,7 +210,7 @@ export function VotingProvider({ children }: { children: ReactNode }) {
 
     // Proceed with the switch
     setSelectedLevel(newLevel);
-  }, [selectedLevel, positions, user?.branch, hasUserVotedForPosition]);
+  }, [selectedLevel, positions, user?.branch, user?.role, hasUserVotedForPosition]);
 
   return (
     <VotingContext.Provider

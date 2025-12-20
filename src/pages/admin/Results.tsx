@@ -1,40 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { CandidateCard } from '@/components/shared/CandidateCard';
 import { mockPositions, mockBranches } from '@/data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { 
   Download, 
   Trophy, 
   Megaphone, 
-  BarChart3, 
-  PieChart,
   TrendingUp,
   Share2,
   AlertTriangle,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AnnounceWinnerDialog } from '@/components/admin/AnnounceWinnerDialog';
+import { useVoting } from '@/contexts/VotingContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminResults() {
-  const [selectedPosition, setSelectedPosition] = useState(mockPositions[0]?.id);
   const [showAnnounceDialog, setShowAnnounceDialog] = useState(false);
+  const { user } = useAuth();
+  const { selectedLevel, setSelectedLevel, positions: allPositions } = useVoting();
 
-  const positions = mockPositions;
-  const currentPosition = positions.find(p => p.id === selectedPosition);
-  const sortedCandidates = currentPosition?.candidates.slice().sort((a, b) => b.percentage - a.percentage) || [];
-  const leader = sortedCandidates[0];
+  // Default to national level if not set
+  useEffect(() => {
+    if (!selectedLevel) {
+      setSelectedLevel('national');
+    }
+  }, [selectedLevel, setSelectedLevel]);
+
+  // Filter positions based on selected level
+  const activeLevel = selectedLevel || 'national';
+  const positions = allPositions.filter(p => {
+    if (activeLevel === 'national') {
+      return p.type === 'national';
+    } else {
+      return p.type === 'branch' && p.branch === user?.branch;
+    }
+  });
+
+  const [expandedPositions, setExpandedPositions] = useState<string[]>([positions[0]?.id]);
+  
+  // Calculate overall stats
+  const totalVotesAllPositions = positions.reduce((sum, p) => sum + p.totalVotes, 0);
+  const totalEligibleVoters = positions.reduce((sum, p) => sum + p.eligibleVoters, 0);
+  const overallTurnout = (totalVotesAllPositions / totalEligibleVoters * 100).toFixed(1);
 
   return (
     <DashboardLayout title="Live Results & Analytics">
@@ -48,16 +66,9 @@ export default function AdminResults() {
             </span>
             <span className="text-sm font-medium text-success">Live</span>
           </div>
-          <Select value={selectedPosition} onValueChange={setSelectedPosition}>
-            <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Select position" />
-            </SelectTrigger>
-            <SelectContent>
-              {positions.map(p => (
-                <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="text-sm text-muted-foreground">
+            {positions.length} Positions • {totalVotesAllPositions.toLocaleString()} Total Votes
+          </div>
         </div>
         
         <div className="flex gap-2">
@@ -79,235 +90,172 @@ export default function AdminResults() {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* Main Results */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Position Stats */}
-          <div className="grid grid-cols-4 gap-4">
+          {/* Overall Stats */}
+          <div className="grid grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">Total Votes</div>
-                <div className="text-2xl font-bold">{currentPosition?.totalVotes.toLocaleString()}</div>
+                <div className="text-sm text-muted-foreground">Total Votes Cast</div>
+                <div className="text-2xl font-bold">{totalVotesAllPositions.toLocaleString()}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">Turnout</div>
-                <div className="text-2xl font-bold text-accent">
-                  {((currentPosition?.totalVotes || 0) / (currentPosition?.eligibleVoters || 1) * 100).toFixed(1)}%
-                </div>
+                <div className="text-sm text-muted-foreground">Overall Turnout</div>
+                <div className="text-2xl font-bold text-accent">{overallTurnout}%</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">Leading By</div>
-                <div className="text-2xl font-bold text-success">
-                  {(sortedCandidates[0]?.percentage - (sortedCandidates[1]?.percentage || 0)).toFixed(1)}%
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">Candidates</div>
-                <div className="text-2xl font-bold">{currentPosition?.candidates.length}</div>
+                <div className="text-sm text-muted-foreground">Active Positions</div>
+                <div className="text-2xl font-bold">{positions.length}</div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Results Visualization */}
-          <Tabs defaultValue="bar" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <TabsList>
-                <TabsTrigger value="bar" className="gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Bar Chart
-                </TabsTrigger>
-                <TabsTrigger value="cards" className="gap-2">
-                  <PieChart className="h-4 w-4" />
-                  Card View
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="bar">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                    {sortedCandidates.map((candidate, index) => (
-                      <div key={candidate.id} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <span className={cn(
-                              'flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold',
-                              index === 0 ? 'bg-accent text-accent-foreground' : 'bg-secondary'
-                            )}>
-                              {index + 1}
-                            </span>
-                            <div>
-                              <span className="font-medium">{candidate.name}</span>
-                              {index === 0 && (
-                                <Badge className="ml-2 bg-accent text-accent-foreground">
-                                  <Trophy className="h-3 w-3 mr-1" />
-                                  Leading
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold">{candidate.percentage.toFixed(1)}%</span>
-                            <span className="text-muted-foreground text-sm ml-2">
-                              ({candidate.voteCount.toLocaleString()})
-                            </span>
-                          </div>
-                        </div>
-                        <Progress 
-                          value={candidate.percentage} 
-                          className="h-4"
-                          indicatorClassName={cn(
-                            'transition-all duration-1000 progress-animate',
-                            index === 0 ? 'bg-accent' : 'bg-primary/70'
-                          )}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="cards" className="space-y-4">
-              {sortedCandidates.map((candidate, index) => (
-                <CandidateCard
-                  key={candidate.id}
-                  candidate={candidate}
-                  isLeading={index === 0}
-                  showAdminControls
-                />
-              ))}
-            </TabsContent>
-          </Tabs>
-
-          {/* Branch Breakdown */}
+          {/* Position Results Accordion */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-accent" />
-                Branch-by-Branch Results
-              </CardTitle>
+              <CardTitle className="text-lg">Results by Position</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mockBranches.map((branch) => {
-                  // Simulate different branch results
-                  const branchLeader = sortedCandidates[Math.floor(Math.random() * 2)];
+            <CardContent className="p-0">
+              <Accordion 
+                type="multiple" 
+                value={expandedPositions} 
+                onValueChange={setExpandedPositions}
+                className="w-full"
+              >
+                {positions.map((position) => {
+                  const sortedCandidates = position.candidates.slice().sort((a, b) => b.percentage - a.percentage);
+                  const leader = sortedCandidates[0];
+                  const turnout = ((position.totalVotes / position.eligibleVoters) * 100).toFixed(1);
+                  
                   return (
-                    <div key={branch.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-                      <div className="w-40">
-                        <p className="font-medium text-sm">{branch.name}</p>
-                        <p className="text-xs text-muted-foreground">{branch.votedCount.toLocaleString()} votes</p>
-                      </div>
-                      <div className="flex-1">
-                        <Progress value={branch.turnoutPercentage} className="h-2" indicatorClassName="bg-accent" />
-                      </div>
-                      <div className="w-32 text-right">
-                        <p className="text-sm font-medium">{branchLeader?.name.split(' ').slice(-1)[0]}</p>
-                        <p className="text-xs text-muted-foreground">Leading here</p>
-                      </div>
-                    </div>
+                    <AccordionItem key={position.id} value={position.id} className="border-b last:border-0">
+                      <AccordionTrigger className="px-6 hover:bg-muted/50 hover:no-underline">
+                        <div className="flex items-center justify-between w-full pr-4">
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <h3 className="font-semibold text-base text-left">{position.title}</h3>
+                              <p className="text-sm text-muted-foreground text-left">
+                                {position.totalVotes.toLocaleString()} votes • {turnout}% turnout
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <p className="text-sm font-medium">{leader.name}</p>
+                              <p className="text-xs text-muted-foreground">Leading with {leader.percentage.toFixed(1)}%</p>
+                            </div>
+                            <Badge className="bg-accent text-accent-foreground">
+                              <Trophy className="h-3 w-3 mr-1" />
+                              {leader.voteCount.toLocaleString()}
+                            </Badge>
+                          </div>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-6 pb-6">
+                        <div className="space-y-4 mt-2">
+                          {sortedCandidates.map((candidate, index) => (
+                            <div key={candidate.id} className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <span className={cn(
+                                    'flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold',
+                                    index === 0 ? 'bg-accent text-accent-foreground' : 'bg-secondary'
+                                  )}>
+                                    {index + 1}
+                                  </span>
+                                  <div>
+                                    <span className="font-medium">{candidate.name}</span>
+                                    {index === 0 && (
+                                      <Badge className="ml-2 bg-accent text-accent-foreground">
+                                        <Trophy className="h-3 w-3 mr-1" />
+                                        Leading
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-2xl font-bold">{candidate.percentage.toFixed(1)}%</span>
+                                  <span className="text-muted-foreground text-sm ml-2">
+                                    ({candidate.voteCount.toLocaleString()})
+                                  </span>
+                                </div>
+                              </div>
+                              <Progress 
+                                value={candidate.percentage} 
+                                className="h-4"
+                                indicatorClassName={cn(
+                                  'transition-all duration-1000',
+                                  index === 0 ? 'bg-accent' : 'bg-primary/70'
+                                )}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
                   );
                 })}
-              </div>
+              </Accordion>
             </CardContent>
           </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Winner Preview */}
+          {/* Top Leaders */}
           <Card className="border-accent bg-accent/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-accent" />
-                Projected Winner
+                Leading Candidates
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-xl font-bold text-accent">
-                  {leader?.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-                <h3 className="font-semibold text-lg">{leader?.name}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{currentPosition?.title}</p>
-                <div className="flex justify-center gap-4 text-sm">
-                  <div>
-                    <p className="font-bold text-accent">{leader?.percentage.toFixed(1)}%</p>
-                    <p className="text-muted-foreground">Vote share</p>
-                  </div>
-                  <div>
-                    <p className="font-bold">{leader?.voteCount.toLocaleString()}</p>
-                    <p className="text-muted-foreground">Total votes</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Position List */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">All Positions</CardTitle>
-            </CardHeader>
-            <CardContent className="p-2">
-              {positions.map((position) => {
-                const posLeader = position.candidates.reduce((a, b) => 
+            <CardContent className="space-y-3">
+              {positions.slice(0, 3).map((position) => {
+                const leader = position.candidates.reduce((a, b) => 
                   a.percentage > b.percentage ? a : b
                 );
                 return (
-                  <button
-                    key={position.id}
-                    onClick={() => setSelectedPosition(position.id)}
-                    className={cn(
-                      'w-full text-left p-3 rounded-lg transition-colors',
-                      selectedPosition === position.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-muted'
-                    )}
-                  >
-                    <p className="font-medium text-sm">{position.title}</p>
-                    <p className={cn(
-                      'text-xs mt-0.5',
-                      selectedPosition === position.id ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                    )}>
-                      {posLeader.name} • {posLeader.percentage.toFixed(1)}%
-                    </p>
-                  </button>
+                  <div key={position.id} className="p-3 rounded-lg bg-background border">
+                    <p className="text-xs text-muted-foreground mb-1">{position.title}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-sm">{leader.name}</p>
+                      <Badge variant="secondary" className="text-xs">
+                        {leader.percentage.toFixed(1)}%
+                      </Badge>
+                    </div>
+                  </div>
                 );
               })}
             </CardContent>
           </Card>
 
-          {/* Demo Mode Override */}
-          <Card className="border-warning/50 bg-warning/5">
+          {/* Quick Stats */}
+          <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2 text-warning">
-                <AlertTriangle className="h-4 w-4" />
-                Demo Mode
-              </CardTitle>
+              <CardTitle className="text-base">Quick Stats</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Override vote margins for demonstration purposes
-              </p>
-              <Select defaultValue="actual">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="actual">Actual Results</SelectItem>
-                  <SelectItem value="close">Close Race (±2%)</SelectItem>
-                  <SelectItem value="landslide">Landslide (60%+)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-warning">
-                Demo mode is for presentations only
-              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Positions</span>
+                <span className="font-semibold">{positions.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Total Candidates</span>
+                <span className="font-semibold">
+                  {positions.reduce((sum, p) => sum + p.candidates.length, 0)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Eligible Voters</span>
+                <span className="font-semibold">{totalEligibleVoters.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Votes Cast</span>
+                <span className="font-semibold">{totalVotesAllPositions.toLocaleString()}</span>
+              </div>
             </CardContent>
           </Card>
         </div>
