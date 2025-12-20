@@ -184,7 +184,7 @@ export default function SuperuseradminDashboard() {
                     </span>
                     <Dialog open={showLimitsDialog} onOpenChange={setShowLimitsDialog}>
                         <DialogTrigger asChild>
-                            <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors shadow-sm h-8 px-4">
                                 Manage
                             </Button>
                         </DialogTrigger>
@@ -332,7 +332,7 @@ export default function SuperuseradminDashboard() {
                     </span>
                     <Dialog open={showWinnersDialog} onOpenChange={setShowWinnersDialog}>
                         <DialogTrigger asChild>
-                           <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+                           <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors shadow-sm h-8 px-4">
                              Manage
                            </Button>
                         </DialogTrigger>
