@@ -22,10 +22,10 @@ export function TopBar({ title }: TopBarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b bg-background/95 px-2 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+    <header className="sticky top-0 z-30 flex min-h-[3.5rem] items-center justify-between border-b bg-background/95 px-4 sm:px-6 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 sm:flex-none">
         <MobileSidebar />
-        <h1 className="text-sm sm:text-xl font-semibold text-foreground truncate">{title}</h1>
+        <h1 className="text-sm sm:text-xl font-bold text-foreground line-clamp-2 leading-tight">{title}</h1>
       </div>
 
       <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">

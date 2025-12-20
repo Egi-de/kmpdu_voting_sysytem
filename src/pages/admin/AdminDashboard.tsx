@@ -52,34 +52,37 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout title="Admin Dashboard">
       {/* Status Banner */}
-      <div className="mb-6 rounded-xl gradient-hero p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+      <div className="mb-6 rounded-xl gradient-hero p-5 sm:p-6 text-white shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-success opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
               </span>
-              <span className="text-sm font-medium">Election Active</span>
+              <span className="text-sm font-semibold uppercase tracking-wider truncate">Active</span>
             </div>
-            <h2 className="text-2xl font-bold">KMPDU 2024 National Elections</h2>
-            <p className="text-white/70 mt-1">Started Dec 1, 2024 • Ends Dec 5, 2024 at 6:00 PM</p>
+            <h2 className="text-xl sm:text-2xl font-bold truncate">
+              <span className="xs:hidden">Elections</span>
+              <span className="hidden xs:inline">KMPDU 2024 National Elections</span>
+            </h2>
+            <p className="text-sm text-white/80 mt-1.5 font-medium">Started Dec 1, 2024 • Ends Dec 5, 2024</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="secondary" className="gap-2">
+          <div className="flex flex-wrap gap-2.5">
+            <Button variant="secondary" size="default" className="gap-2 flex-1 sm:flex-none font-bold shadow-sm h-10">
               <Pause className="h-4 w-4" />
               Pause Election
             </Button>
-            <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 gap-2">
+            <Button variant="outline" size="default" className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2 flex-1 sm:flex-none font-bold h-10 backdrop-blur-sm">
               <Download className="h-4 w-4" />
-              Export Data
+              Export
             </Button>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid gap-2 sm:gap-4 md:grid-cols-2 lg:grid-cols-4 mb-2 sm:mb-6">
         <StatCard
           title="Registered Voters"
           value={stats.totalVoters.toLocaleString()}
@@ -110,43 +113,43 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-3 sm:space-y-6">
           {/* Branch Analytics - Only show in National view */}
           {activeLevel === 'national' && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Building className="h-4 w-4 text-accent" />
-                  Branch-by-Branch Analytics
+            <Card className="overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between p-3 sm:p-4 pb-1 sm:pb-2">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+                  <Building className="h-4 w-4 text-accent shrink-0" />
+                  <span className="truncate xs:hidden">Branches</span>
+                  <span className="truncate hidden xs:inline">Branch Analytics</span>
                 </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/admin/branches')}>
-                  View All
-                  <ChevronRight className="h-4 w-4 ml-1" />
+                <Button variant="ghost" size="sm" onClick={() => navigate('/admin/branches')} className="h-7 px-1.5 sm:px-2 text-[10px] sm:text-sm">
+                  <span className="hidden xs:inline">View All</span>
+                  <ChevronRight className="h-3 w-3 sm:ml-1" />
                 </Button>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="p-3 sm:p-6 pt-2 sm:pt-4">
+                <div className="space-y-2 sm:space-y-4">
                   {mockBranches.slice(0, 5).map((branch, index) => (
-                    <div key={branch.id} className="flex items-center gap-4 stagger-enter" style={{ animationDelay: `${index * 50}ms` }}>
-                      <div className="w-32 truncate text-sm font-medium">{branch.name.replace(' Branch', '')}</div>
-                      <div className="flex-1">
-                        <Progress 
-                          value={branch.turnoutPercentage} 
-                          className="h-2"
-                          indicatorClassName={cn(
-                            branch.turnoutPercentage >= 75 ? 'bg-success' :
-                            branch.turnoutPercentage >= 50 ? 'bg-accent' :
-                            'bg-warning'
-                          )}
-                        />
-                      </div>
-                      <div className="w-20 text-right">
-                        <span className="font-semibold">{branch.turnoutPercentage}%</span>
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({branch.votedCount.toLocaleString()})
-                        </span>
+                    <div key={branch.id} className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-4 stagger-enter" style={{ animationDelay: `${index * 50}ms` }}>
+                      <div className="w-full xs:w-32 truncate text-xs sm:text-sm font-medium">{branch.name.replace(' Branch', '')}</div>
+                      <div className="flex-1 flex items-center gap-3">
+                        <div className="flex-1">
+                          <Progress 
+                            value={branch.turnoutPercentage} 
+                            className="h-1.5 sm:h-2"
+                            indicatorClassName={cn(
+                              branch.turnoutPercentage >= 75 ? 'bg-success' :
+                              branch.turnoutPercentage >= 50 ? 'bg-accent' :
+                              'bg-warning'
+                            )}
+                          />
+                        </div>
+                        <div className="w-10 sm:w-20 text-right shrink-0">
+                          <span className="text-[10px] sm:text-sm font-semibold">{branch.turnoutPercentage}%</span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -157,14 +160,15 @@ export default function AdminDashboard() {
 
           {/* Branch-specific info - Only show in Branch view */}
           {activeLevel === 'branch' && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
+            <Card className="overflow-hidden">
+              <CardHeader className="p-3 sm:p-4 pb-1 sm:pb-2">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   <Building className="h-4 w-4 text-accent" />
-                  {user?.branch} Overview
+                  <span className="truncate xs:hidden">{user?.branch}</span>
+                  <span className="truncate hidden xs:inline">{user?.branch} Overview</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6 pt-2 sm:pt-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Branch</span>
@@ -188,15 +192,18 @@ export default function AdminDashboard() {
           )}
 
           {/* Positions Overview */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base">Position Analytics</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/admin/positions')}>
-                Manage Positions
-                <ChevronRight className="h-4 w-4 ml-1" />
+          <Card className="overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between p-3 sm:p-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base truncate flex-1">
+                <span className="xs:hidden">Positions</span>
+                <span className="hidden xs:inline">Position Analytics</span>
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/admin/positions')} className="h-7 px-1.5 sm:px-2 text-[10px] sm:text-sm">
+                <span className="hidden xs:inline">Manage</span>
+                <ChevronRight className="h-3 w-3 sm:ml-1" />
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6 pt-2 sm:pt-4">
               {positions.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   No {activeLevel} positions found
@@ -211,13 +218,13 @@ export default function AdminDashboard() {
                     return (
                       <div
                         key={position.id}
-                        className="rounded-lg border p-4 hover:shadow-md transition-shadow cursor-pointer"
+                        className="rounded-lg border p-2.5 sm:p-4 hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => navigate('/admin/results')}
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-medium">{position.title}</h4>
+                        <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1.5 xs:gap-0 mb-2">
+                          <h4 className="text-sm font-medium truncate w-full xs:w-auto xs:flex-1 xs:mr-2">{position.title}</h4>
                           <Badge variant="outline" className={cn(
-                            'text-xs',
+                            'text-[10px] sm:text-xs px-1.5 h-5 shrink-0 w-fit',
                             position.status === 'active' && 'bg-success/10 text-success border-success/20'
                           )}>
                             {position.status === 'active' && (
@@ -226,16 +233,19 @@ export default function AdminDashboard() {
                             {position.status}
                           </Badge>
                         </div>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-xs">
                             <span className="text-muted-foreground">Leading</span>
-                            <span className="font-medium">{leader.name.split(' ').slice(-1)[0]} ({leader.percentage.toFixed(1)}%)</span>
+                            <div className="flex items-center gap-1 min-w-0 max-w-[60%] justify-end">
+                                <span className="font-medium truncate">{leader.name.split(' ').slice(-1)[0]}</span>
+                                <span className="text-muted-foreground shrink-0">({leader.percentage.toFixed(0)}%)</span>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center justify-between text-xs">
                             <span className="text-muted-foreground">Turnout</span>
-                            <span className="font-medium">{turnout.toFixed(1)}%</span>
+                            <span className="font-medium">{turnout.toFixed(0)}%</span>
                           </div>
-                          <Progress value={turnout} className="h-1.5" indicatorClassName="bg-accent" />
+                          <Progress value={turnout} className="h-1" indicatorClassName="bg-accent" />
                         </div>
                       </div>
                     );
@@ -247,36 +257,42 @@ export default function AdminDashboard() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-6">
           {/* Quick Actions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Quick Actions</CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="p-3 sm:p-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base">
+                <span className="xs:hidden">Actions</span>
+                <span className="hidden xs:inline">Quick Actions</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-2">
-              <Button variant="outline" className="justify-start" onClick={() => navigate('/admin/positions')}>
-                <Play className="h-4 w-4 mr-2" />
-                Start New Position
+            <CardContent className="p-3 sm:p-6 pt-2 sm:pt-4 grid gap-1.5">
+              <Button variant="outline" size="sm" className="justify-start h-8 px-2 text-xs" onClick={() => navigate('/admin/positions')}>
+                <Play className="h-3 w-3 mr-1.5 shrink-0" />
+                <span className="truncate">Start Position</span>
               </Button>
-              <Button variant="outline" className="justify-start" onClick={() => navigate('/admin/candidates')}>
-                <Users className="h-4 w-4 mr-2" />
-                Add Candidate
+              <Button variant="outline" size="sm" className="justify-start h-8 px-2 text-xs" onClick={() => navigate('/admin/candidates')}>
+                <Users className="h-3 w-3 mr-1.5 shrink-0" />
+                <span className="truncate">Add Candidate</span>
               </Button>
-              <Button variant="outline" className="justify-start" onClick={() => navigate('/admin/results')}>
-                <TrendingUp className="h-4 w-4 mr-2" />
-                View Live Results
+              <Button variant="outline" size="sm" className="justify-start h-8 px-2 text-xs" onClick={() => navigate('/admin/results')}>
+                <TrendingUp className="h-3 w-3 mr-1.5 shrink-0" />
+                <span className="truncate">Live Results</span>
               </Button>
-              <Button variant="outline" className="justify-start" onClick={() => navigate('/admin/audit')}>
-                <Shield className="h-4 w-4 mr-2" />
-                Audit Trail
+              <Button variant="outline" size="sm" className="justify-start h-8 px-2 text-xs" onClick={() => navigate('/admin/audit')}>
+                <Shield className="h-3 w-3 mr-1.5 shrink-0" />
+                <span className="truncate">Audit Trail</span>
               </Button>
             </CardContent>
           </Card>
 
           {/* Admin Notifications */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-base">System Alerts</CardTitle>
+              <CardTitle className="text-base">
+                <span className="xs:hidden">Alerts</span>
+                <span className="hidden xs:inline">System Alerts</span>
+              </CardTitle>
               <Badge variant="secondary">{mockAdminNotifications.filter(n => !n.read).length} new</Badge>
             </CardHeader>
             <CardContent className="p-2 space-y-1">
@@ -287,11 +303,12 @@ export default function AdminDashboard() {
           </Card>
 
           {/* Blockchain Status */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Shield className="h-4 w-4 text-accent" />
-                Blockchain Status
+                <span className="xs:hidden">Status</span>
+                <span className="hidden xs:inline">Blockchain Status</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

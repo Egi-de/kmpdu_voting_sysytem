@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { mockBranches } from '@/data/mockData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -95,78 +103,80 @@ export default function AdminBranches() {
         </Button>
       </div>
 
-      {/* Branches Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {branches.map((branch, index) => (
-          <Card 
-            key={branch.id} 
-            className="hover:shadow-md transition-shadow stagger-enter"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <MapPin className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">{branch.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      {branch.totalMembers.toLocaleString()} members
-                    </p>
-                  </div>
-                </div>
-                <Badge className={cn(
-                  branch.turnoutPercentage >= 75 ? 'bg-success/10 text-success border-success/20' :
-                  branch.turnoutPercentage >= 50 ? 'bg-warning/10 text-warning border-warning/20' :
-                  'bg-destructive/10 text-destructive border-destructive/20'
-                )} variant="outline">
-                  {branch.turnoutPercentage >= 75 ? 'High' :
-                   branch.turnoutPercentage >= 50 ? 'Medium' : 'Low'} Turnout
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Voted</p>
-                  <p className="font-semibold text-success">{branch.votedCount.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Remaining</p>
-                  <p className="font-semibold text-warning">
-                    {(branch.totalMembers - branch.votedCount).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Turnout</span>
-                  <span className="font-semibold">{branch.turnoutPercentage}%</span>
-                </div>
-                <Progress 
-                  value={branch.turnoutPercentage} 
-                  className="h-2"
-                  indicatorClassName={cn(
-                    branch.turnoutPercentage >= 75 ? 'bg-success' :
-                    branch.turnoutPercentage >= 50 ? 'bg-accent' :
-                    'bg-warning'
-                  )}
-                />
-              </div>
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full"
-                onClick={() => handleViewDetails(branch)}
-              >
-                View Details
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Branches Table */}
+      <div className="rounded-md border bg-card">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Branch Name</TableHead>
+                <TableHead className="text-right">Total Members</TableHead>
+                <TableHead className="text-right">Voted</TableHead>
+                <TableHead className="text-right">Remaining</TableHead>
+                <TableHead className="min-w-[150px]">Turnout</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[100px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {branches.map((branch) => (
+                <TableRow key={branch.id}>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                        <MapPin className="h-4 w-4 text-primary" />
+                      </div>
+                      <span className="whitespace-nowrap">{branch.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">{branch.totalMembers.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <span className="text-success">{branch.votedCount.toLocaleString()}</span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="text-warning">{(branch.totalMembers - branch.votedCount).toLocaleString()}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium">{branch.turnoutPercentage}%</span>
+                      </div>
+                      <Progress 
+                        value={branch.turnoutPercentage} 
+                        className="h-2" 
+                        indicatorClassName={cn(
+                          branch.turnoutPercentage >= 75 ? 'bg-success' :
+                          branch.turnoutPercentage >= 50 ? 'bg-accent' :
+                          'bg-warning'
+                        )}
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={cn(
+                      "whitespace-nowrap",
+                      branch.turnoutPercentage >= 75 ? 'bg-success/10 text-success border-success/20' :
+                      branch.turnoutPercentage >= 50 ? 'bg-warning/10 text-warning border-warning/20' :
+                      'bg-destructive/10 text-destructive border-destructive/20'
+                    )}>
+                      {branch.turnoutPercentage >= 75 ? 'High' :
+                       branch.turnoutPercentage >= 50 ? 'Medium' : 'Low'} Turnout
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleViewDetails(branch)}
+                    >
+                      Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Branch Details Dialog */}

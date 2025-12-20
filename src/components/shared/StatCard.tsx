@@ -43,41 +43,41 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'rounded-xl border p-5 transition-all duration-200 hover:shadow-md',
+        'rounded-xl border p-3 sm:p-5 transition-all duration-200 hover:shadow-md',
         variants[variant],
         className
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight text-foreground number-roll">
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
+          <p className="text-xl sm:text-3xl font-bold tracking-tight text-foreground number-roll">
             {value}
           </p>
           {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{subtitle}</p>
           )}
           {trend && (
             <div className="flex items-center gap-1 pt-1">
               <span
                 className={cn(
-                  'text-sm font-medium',
+                  'text-xs sm:text-sm font-bold whitespace-nowrap',
                   trend.positive ? 'text-success' : 'text-destructive'
                 )}
               >
                 {trend.positive ? '+' : ''}{trend.value}%
               </span>
-              <span className="text-xs text-muted-foreground">{trend.label}</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">{trend.label}</span>
             </div>
           )}
         </div>
         <div
           className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl',
+            'flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl shrink-0',
             iconVariants[variant]
           )}
         >
-          <Icon className="h-6 w-6" />
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
       </div>
     </div>

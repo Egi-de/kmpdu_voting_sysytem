@@ -23,10 +23,14 @@ import {
   Lock,
   Trash2,
   AlertTriangle,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTheme } from 'next-themes';
 
 export default function Settings() {
+  const { theme, setTheme } = useTheme();
   const handleSaveSettings = () => {
     toast.success('Settings saved successfully');
   };
@@ -62,6 +66,38 @@ export default function Settings() {
                 <div className="space-y-2">
                   <Label htmlFor="orgName">Organization Name</Label>
                   <Input id="orgName" defaultValue="Kenya Medical Practitioners and Dentists Union" />
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <Label className="text-base">Appearance</Label>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium">System Theme</p>
+                    <p className="text-xs text-muted-foreground">Customize how the application looks for you</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant={theme === 'light' ? 'default' : 'outline'} 
+                      size="sm" 
+                      onClick={() => setTheme('light')}
+                      className="flex-1 sm:flex-none gap-2"
+                    >
+                      <Sun className="h-4 w-4" />
+                      Light
+                    </Button>
+                    <Button 
+                      variant={theme === 'dark' ? 'default' : 'outline'} 
+                      size="sm" 
+                      onClick={() => setTheme('dark')}
+                      className="flex-1 sm:flex-none gap-2"
+                    >
+                      <Moon className="h-4 w-4" />
+                      Dark
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
