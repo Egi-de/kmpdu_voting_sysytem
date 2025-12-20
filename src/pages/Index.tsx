@@ -216,26 +216,7 @@ const Index = () => {
     },
   ];
 
-  const testimonials = [
-    {
-      name: 'Dr. Sarah Kimani',
-      role: 'Secretary General',
-      quote: 'The blockchain verification gives me complete confidence in the integrity of our union elections. This is the future of democratic voting.',
-      rating: 5,
-    },
-    {
-      name: 'Dr. James Mwangi',
-      role: 'Branch Secretary',
-      quote: 'I was able to vote from my phone in less than 2 minutes. The SMS confirmation and blockchain receipt made me feel secure about my vote.',
-      rating: 5,
-    },
-    {
-      name: 'Dr. Grace Ochieng',
-      role: 'Union Member',
-      quote: 'Finally, a voting system that is transparent, secure, and easy to use. I could vote from anywhere without compromising my privacy.',
-      rating: 5,
-    },
-  ];
+
 
   return (
     <div className="force-light min-h-screen bg-background">
@@ -543,47 +524,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-12 sm:py-20 md:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-3 sm:mb-4">
-              What Our Members Say
-            </h2>
-            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Hear from KMPDU members who have experienced our secure voting platform
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-gradient-to-br from-[#1e3a8a] to-[#3b82f6] border-0">
-                <CardContent className="p-6">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-white mb-6 leading-relaxed">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="border-t border-white/20 pt-4">
-                    <p className="text-white font-semibold">{testimonial.name}</p>
-                    <p className="text-blue-200 text-sm">{testimonial.role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
 
-          <div className="text-center mt-8">
-            <div className="inline-block bg-blue-50 rounded-lg p-4 border border-blue-100">
-              <Button className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-                View All Reviews
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="verify" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
