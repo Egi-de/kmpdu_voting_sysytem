@@ -10,7 +10,7 @@ import { ThemeProvider } from "next-themes";
 // Pages
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import MemberDashboard from "./pages/member/MemberDashboard";
+// MemberDashboard removed
 import Ballot from "./pages/member/Ballot";
 import MemberNotifications from "./pages/member/Notifications";
 import MemberSettings from "./pages/member/Settings";
@@ -56,13 +56,7 @@ function AppRoutes() {
         <Route path="/" element={<Index />} />
         <Route
           path="/login"
-          element={
-            isAuthenticated ? (
-              <Navigate to={user?.role === 'admin' ? '/admin' : '/member'} replace />
-            ) : (
-              <Login />
-            )
-          }
+          element={<Login />}
         />
         <Route path="*" element={<NotFound />} />
       </Route>
@@ -77,7 +71,7 @@ function AppRoutes() {
           path="/member"
           element={
             <ProtectedRoute role="member">
-              <MemberDashboard />
+              <Navigate to="/member/ballot" replace />
             </ProtectedRoute>
           }
         />

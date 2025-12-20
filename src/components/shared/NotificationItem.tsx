@@ -50,17 +50,17 @@ export function NotificationItem({ notification, className }: NotificationItemPr
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <h4 className={cn('font-medium text-sm', !notification.read && 'text-foreground')}>
+          <h4 className={cn('font-medium text-[11px] sm:text-sm', !notification.read && 'text-foreground')}>
             {notification.title}
           </h4>
           {!notification.read && (
-            <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
           )}
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+        <p className="text-[10px] sm:text-sm text-muted-foreground mt-0.5 line-clamp-2 leading-tight">
           {notification.message}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-[9px] sm:text-xs text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
           {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
         </p>
       </div>

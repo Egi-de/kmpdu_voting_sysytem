@@ -22,13 +22,13 @@ export function TopBar({ title }: TopBarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b bg-background/95 px-2 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
         <MobileSidebar />
-        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+        <h1 className="text-sm sm:text-xl font-semibold text-foreground truncate">{title}</h1>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
         {/* Countdown */}
         <div className="hidden md:flex items-center gap-2 text-sm">
           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -45,28 +45,28 @@ export function TopBar({ title }: TopBarProps) {
           />
         </div>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle - Hidden on very small screens */}
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleTheme}
-          className="relative"
+          className="relative hidden sm:inline-flex h-8 w-8 sm:h-9 sm:w-9"
         >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <Sun className="h-4 w-4 sm:h-5 sm:w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 sm:h-5 sm:w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+        <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-9 sm:w-9">
+          <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+          <Badge variant="destructive" className="absolute -top-1 -right-1 h-3 w-3 sm:h-5 sm:w-5 p-0 flex items-center justify-center text-[8px] sm:text-xs">
             3
           </Badge>
         </Button>
 
         {/* User Avatar */}
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+        <div className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary text-xs sm:text-sm font-semibold text-primary-foreground">
           {user?.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
         </div>
       </div>

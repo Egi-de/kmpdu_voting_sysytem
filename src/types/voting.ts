@@ -10,6 +10,14 @@ export interface User {
   memberId: string;
   avatar?: string;
   hasVoted?: Record<string, boolean>; // Track voted positions by position ID
+  // Additional verification details
+  firstName?: string;
+  surname?: string;
+  county?: string;
+  constituency?: string;
+  ward?: string;
+  facility?: string;
+  station?: string;
 }
 
 export interface Candidate {

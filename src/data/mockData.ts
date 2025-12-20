@@ -9,6 +9,14 @@ export const mockUser: User = {
   branch: 'Nairobi Branch',
   memberId: 'KMPDU-2024-00456',
   avatar: undefined,
+  // Additional verification details
+  firstName: 'SARAH',
+  surname: 'WANJIKU',
+  county: 'NAIROBI',
+  constituency: 'WESTLANDS',
+  ward: 'PARKLANDS',
+  facility: 'AGA KHAN UNIVERSITY HOSPITAL',
+  station: 'MAIN HALL A',
 };
 
 export const mockAdminUser: User = {
@@ -51,6 +59,18 @@ export const mockCandidates: Record<string, Candidate[]> = {
   nairobi_chair: [
     { id: 'cand_009', name: 'Dr. Lucy Mwangi', photo: undefined, bio: 'KNH consultant and branch activist', position: 'Nairobi Branch Chairman', voteCount: 1820, percentage: 50.3 },
     { id: 'cand_010', name: 'Dr. Michael Otieno', photo: undefined, bio: 'Private practice owner and union organizer', position: 'Nairobi Branch Chairman', voteCount: 1796, percentage: 49.7 },
+  ],
+  nairobi_secretary: [
+    { id: 'cand_011', name: 'Dr. Emily Chebet', photo: undefined, bio: 'Public health researcher and policy expert', position: 'Nairobi Branch Secretary', voteCount: 1950, percentage: 54.0 },
+    { id: 'cand_012', name: 'Dr. Robert Kinuthia', photo: undefined, bio: 'Experienced labor relations consultant', position: 'Nairobi Branch Secretary', voteCount: 1666, percentage: 46.0 },
+  ],
+  nairobi_treasurer: [
+    { id: 'cand_013', name: 'Dr. Sarah Nabwire', photo: undefined, bio: 'Health finance specialist', position: 'Nairobi Branch Treasurer', voteCount: 2100, percentage: 58.0 },
+    { id: 'cand_014', name: 'Dr. David Masinde', photo: undefined, bio: 'Audit and compliance expert', position: 'Nairobi Branch Treasurer', voteCount: 1516, percentage: 42.0 },
+  ],
+  nairobi_organizing: [
+    { id: 'cand_015', name: 'Dr. Victor Mutua', photo: undefined, bio: 'Grassroots mobilizer and field coordinator', position: 'Nairobi Branch Organizing Secretary', voteCount: 1850, percentage: 51.2 },
+    { id: 'cand_016', name: 'Dr. Alice Wambui', photo: undefined, bio: 'Community health advocate', position: 'Nairobi Branch Organizing Secretary', voteCount: 1766, percentage: 48.8 },
   ],
 };
 
@@ -100,6 +120,42 @@ export const mockPositions: Position[] = [
     startTime: new Date('2024-12-01T08:00:00'),
     endTime: new Date('2024-12-05T18:00:00'),
   },
+  {
+    id: 'pos_005',
+    title: 'Nairobi Branch Secretary',
+    type: 'branch',
+    branch: 'Nairobi Branch',
+    candidates: mockCandidates.nairobi_secretary,
+    totalVotes: 3616,
+    eligibleVoters: 4520,
+    status: 'active',
+    startTime: new Date('2024-12-01T08:00:00'),
+    endTime: new Date('2024-12-05T18:00:00'),
+  },
+  {
+    id: 'pos_006',
+    title: 'Nairobi Branch Treasurer',
+    type: 'branch',
+    branch: 'Nairobi Branch',
+    candidates: mockCandidates.nairobi_treasurer,
+    totalVotes: 3616,
+    eligibleVoters: 4520,
+    status: 'active',
+    startTime: new Date('2024-12-01T08:00:00'),
+    endTime: new Date('2024-12-05T18:00:00'),
+  },
+  {
+    id: 'pos_007',
+    title: 'Nairobi Branch Organizing Secretary',
+    type: 'branch',
+    branch: 'Nairobi Branch',
+    candidates: mockCandidates.nairobi_organizing,
+    totalVotes: 3616,
+    eligibleVoters: 4520,
+    status: 'active',
+    startTime: new Date('2024-12-01T08:00:00'),
+    endTime: new Date('2024-12-05T18:00:00'),
+  },
 ];
 
 export const mockElectionStats: ElectionStats = {
@@ -107,7 +163,7 @@ export const mockElectionStats: ElectionStats = {
   totalVotesCast: 8805,
   turnoutPercentage: 73.9,
   activeBranches: 8,
-  activePositions: 4,
+  activePositions: 7,
   timeRemaining: '1d 6h 23m',
 };
 

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Logo } from '@/components/shared/Logo';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { mockUser } from '@/data/mockData';
 import {
   Shield,
@@ -24,6 +25,9 @@ import {
   Play,
   Menu,
   X,
+  ChevronUp,
+  AlertCircle,
+  Send,
 } from 'lucide-react';
 
 const Index = () => {
@@ -31,21 +35,62 @@ const Index = () => {
   const [verifiedVoter, setVerifiedVoter] = useState<typeof mockUser | null>(null);
   const [verificationError, setVerificationError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showSupportForm, setShowSupportForm] = useState(false);
+  const [supportReason, setSupportReason] = useState('');
+
+  // Handle scroll event to show/hide scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const handleVerify = () => {
     setVerificationError('');
     setVerifiedVoter(null);
+    setShowSupportForm(false);
+    setSupportReason('');
     
     if (!verificationNumber.trim()) {
-      setVerificationError('Please enter your KMPDU membership number');
+      setVerificationError('Please enter your National ID number');
       return;
     }
 
-    if (verificationNumber.toUpperCase() === mockUser.memberId) {
+    // Mock verification - in production this would check against a database
+    // Using '22334455' as the mock National ID for the demo user
+    if (verificationNumber === '22334455') {
       setVerifiedVoter(mockUser);
     } else {
-      setVerificationError('No voter found with this membership number');
+      setVerificationError('No voter found with this National ID number');
     }
+  };
+
+  const handleSupportSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportReason.trim()) return;
+    
+    // In production, this would send the notification to KMPDU support
+    alert(`Support notification sent!\n\nReason: ${supportReason}\n\nKMPDU support will contact you shortly.`);
+    
+    // Reset form
+    setSupportReason('');
+    setShowSupportForm(false);
   };
 
   const features = [
@@ -150,10 +195,11 @@ const Index = () => {
 
   return (
     <div className="force-light min-h-screen bg-background">
+
       <nav className="absolute top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Logo variant="light" />
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            <Logo variant="light" className="w-14 sm:w-auto" />
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-white hover:text-white/80 transition-colors">
                 Features
@@ -163,6 +209,9 @@ const Index = () => {
               </a>
               <a href="#demo" className="text-sm font-medium text-white hover:text-white/80 transition-colors">
                 Demo
+              </a>
+              <a href="#verify" className="text-sm font-medium text-yellow-400 hover:text-yellow-300 transition-colors">
+                Verify Details
               </a>
               <a href="#contact" className="text-sm font-medium text-white hover:text-white/80 transition-colors">
                 Contact
@@ -210,6 +259,13 @@ const Index = () => {
                   Demo
                 </a>
                 <a
+                  href="#verify"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm font-medium text-yellow-400 hover:text-yellow-300 transition-colors py-2"
+                >
+                  Verify Details
+                </a>
+                <a
                   href="#contact"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block text-sm font-medium text-white hover:text-white/80 transition-colors py-2"
@@ -227,89 +283,90 @@ const Index = () => {
         </div>
       </nav>
 
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[600px] flex items-center">
+      <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden min-h-[400px] sm:min-h-[600px] flex items-center">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-[center_top] sm:bg-center bg-no-repeat"
           style={{ backgroundImage: 'url(/heroarea_bg.png)' }}
         >
           <div className="absolute inset-0 bg-[#163269]/40" />
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="relative max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 w-full">
           <div className="text-center max-w-5xl mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 sm:mb-6">
               Secure, Transparent & Democratic
               <br />
               <span className="text-[#7db3ff]">Union Elections Platform</span>
             </h1>
             
-            <p className="text-base md:text-lg text-white mb-8 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-lg text-white mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-2">
               Empowering KMPDU members with blockchain-verified voting technology.
               Cast your vote securely from anywhere, anytime with complete privacy and transparency
             </p>
             
             <Link to="/login">
-              <Button size="lg" className="bg-white text-[#3B5998] hover:bg-gray-100 px-8 h-12 text-base font-semibold rounded-md">
-                Start Voting Now
+              <Button size="lg" className="bg-white text-[#3B5998] hover:bg-gray-100 px-4 sm:px-8 h-8 sm:h-12 text-xs sm:text-base font-semibold rounded-md">
+                <span className="sm:hidden">Start Voting</span>
+                <span className="hidden sm:inline">Start Voting Now</span>
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-white border-y border-gray-200 relative overflow-hidden">
+      <section className="py-8 sm:py-12 bg-white border-y border-gray-200 relative overflow-hidden">
         <img 
           src="/design.png" 
           alt="" 
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 h-full object-contain"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 h-32 sm:h-full object-contain opacity-40 sm:opacity-100"
         />
         <img 
           src="/design.png" 
           alt="" 
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 h-full object-contain scale-x-[-1]"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 h-32 sm:h-full object-contain scale-x-[-1] opacity-40 sm:opacity-100"
         />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-1">{stat.value}</div>
-                <div className="text-sm text-green-600 font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-0.5 sm:mb-1">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-green-600 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-[#f0f7ff] text-center">
+      <section className="py-8 sm:py-12 bg-[#f0f7ff] text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-medium mb-2">
+          <div className="inline-block bg-blue-100 text-blue-700 px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium mb-2">
             why choose KMPDU E-Voting
           </div>
         </div>
       </section>
 
-      <section id="features" className="py-20 md:py-28 bg-white">
+      <section id="features" className="py-12 sm:py-20 md:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-4">
+          <div className="text-center mb-8 sm:mb-16">
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-3 sm:mb-4">
               Built for Trust, Security & Transparency
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-3xl mx-auto">
               Our platform combines cutting-edge blockchain technology with user-friendly design
               to deliver the most secure voting experience.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {features.map((feature, index) => (
               <Card key={index} className={`border-2 ${feature.borderColor} hover:shadow-lg transition-all duration-300`}>
-                <CardContent className="p-6">
-                  <div className={`w-12 h-12 rounded-lg ${feature.color} flex items-center justify-center mb-4`}>
-                    <feature.icon className="h-6 w-6 text-white" />
+                <CardContent className="p-4 sm:p-6">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${feature.color} flex items-center justify-center mb-3 sm:mb-4`}>
+                    <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-[#1e3a8a] mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#1e3a8a] mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -336,14 +393,14 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {steps.map((item, index) => (
               <div key={index} className="text-center">
-                <div className={`w-20 h-20 rounded-full border-2 ${item.color} flex items-center justify-center mx-auto mb-4`}>
-                  <span className={`text-3xl font-bold ${item.color.split(' ')[0]}`}>{item.number}</span>
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 ${item.color} flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
+                  <span className={`text-2xl sm:text-3xl font-bold ${item.color.split(' ')[0]}`}>{item.number}</span>
                 </div>
-                <h3 className="text-xl font-semibold text-[#1e3a8a] mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <h3 className="text-lg sm:text-xl font-semibold text-[#1e3a8a] mb-1 sm:mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">{item.description}</p>
               </div>
             ))}
           </div>
@@ -363,10 +420,10 @@ const Index = () => {
       <section id="demo" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-4">
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-3 sm:mb-4">
               Watch How Easy It Is to Vote
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
               Experience our secure, user-friendly voting process from login to confirmation in this quick demo
             </p>
           </div>
@@ -382,27 +439,27 @@ const Index = () => {
                     className="w-full h-auto"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center shadow-lg cursor-pointer hover:bg-green-600 transition-colors">
-                      <Play className="h-10 w-10 text-white ml-1" fill="white" />
+                    <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-green-500 flex items-center justify-center shadow-lg cursor-pointer hover:bg-green-600 transition-colors">
+                      <Play className="h-6 w-6 sm:h-10 sm:w-10 text-white ml-1" fill="white" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="lg:absolute lg:right-0 lg:bottom-8 lg:w-1/2 mt-8 lg:mt-0">
-                <Card className="border-2 border-blue-200 shadow-xl bg-white">
-                  <CardContent className="p-6 lg:p-8">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-[#1e3a8a] flex items-center justify-center">
-                        <Shield className="h-7 w-7 text-white" />
+              <div className="lg:absolute lg:right-0 lg:bottom-8 lg:w-1/2 mt-6 sm:mt-8 lg:mt-0 px-0 sm:px-0">
+                <Card className="border-2 border-blue-200 shadow-xl bg-white max-w-[280px] sm:max-w-sm mx-auto lg:max-w-none">
+                  <CardContent className="p-2 sm:p-6 lg:p-8">
+                    <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-6">
+                      <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-2xl bg-[#1e3a8a] flex items-center justify-center">
+                        <Shield className="h-4 w-4 sm:h-7 sm:w-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-[#1e3a8a]">Vote Verification</h3>
-                        <p className="text-sm text-gray-600">Blockchain Receipt</p>
+                        <h3 className="text-sm sm:text-lg font-bold text-[#1e3a8a]">Vote Verification</h3>
+                        <p className="text-[10px] sm:text-sm text-gray-600">Blockchain Receipt</p>
                       </div>
                     </div>
                     
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-xl font-mono text-xs">
+                    <div className="space-y-1.5 sm:space-y-3 p-2 sm:p-4 bg-gray-50 rounded-xl font-mono text-[9px] sm:text-xs">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Transaction ID</span>
                         <span className="text-[#1e3a8a] font-semibold">0x7f3a...8b2c</span>
@@ -418,12 +475,12 @@ const Index = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Status</span>
                         <span className="text-green-600 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="h-4 w-4" /> Verified
+                          <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4" /> Verified
                         </span>
                       </div>
                     </div>
                     
-                    <p className="text-xs text-gray-500 mt-4 text-center">
+                    <p className="text-[9px] sm:text-xs text-gray-500 mt-2 sm:mt-4 text-center">
                       Your vote has been permanently recorded on the blockchain
                     </p>
                   </CardContent>
@@ -442,13 +499,13 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-white">
+      <section className="py-12 sm:py-20 md:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-4">
+          <div className="text-center mb-8 sm:mb-16">
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-3 sm:mb-4">
               What Our Members Say
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
               Hear from KMPDU members who have experienced our secure voting platform
             </p>
           </div>
@@ -487,31 +544,32 @@ const Index = () => {
       <section id="verify" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-4">
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#1e3a8a] mb-4">
               Check Your Voter Details
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Enter your KMPDU membership number to verify your registration details before voting
+            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              Enter your National ID number to verify your registration details before voting
             </p>
           </div>
 
           <div className="max-w-2xl mx-auto">
             <Card className="border-2 border-gray-200 shadow-lg">
-              <CardContent className="p-6 md:p-8">
+              <CardContent className="p-3 sm:p-6 md:p-8">
                 <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                  <div className="flex-1">
+                  <div className="flex-1 w-full">
                     <Input
-                      placeholder="Enter KMPDU Number (e.g., KMPDU-2024-00456)"
+                      placeholder="Enter National ID Number"
                       value={verificationNumber}
                       onChange={(e) => setVerificationNumber(e.target.value)}
-                      className="h-12 bg-transparent"
+                      className="h-10 sm:h-12 text-sm sm:text-base bg-transparent w-full"
+                      type="text"
                     />
                   </div>
                   <Button
                     onClick={handleVerify}
-                    className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-12 px-8"
+                    className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-10 sm:h-12 px-6 sm:px-8 w-full sm:w-auto text-sm sm:text-base"
                   >
-                    <Search className="mr-2 h-4 w-4" />
+                    <Search className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     Verify
                   </Button>
                 </div>
@@ -519,59 +577,96 @@ const Index = () => {
                 {verifiedVoter && (
                   <div className="border-t border-gray-200 pt-6">
                     <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      <span className="font-semibold text-[#1e3a8a]">Voter Found</span>
+                      <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                      <span className="font-semibold text-sm sm:text-base text-[#1e3a8a]">Voter Found</span>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <User className="h-5 w-5 text-[#1e3a8a]" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-600">Full Name</p>
-                          <p className="font-medium text-[#1e3a8a]">{verifiedVoter.name}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <Fingerprint className="h-5 w-5 text-[#1e3a8a]" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-600">Membership ID</p>
-                          <p className="font-medium text-[#1e3a8a]">{verifiedVoter.memberId}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                          <MapPin className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-600">Assigned Branch</p>
-                          <p className="font-medium text-[#1e3a8a]">{verifiedVoter.branch}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                          <Mail className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-600">Email Address</p>
-                          <p className="font-medium text-[#1e3a8a]">{verifiedVoter.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 md:col-span-2">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <Phone className="h-5 w-5 text-[#1e3a8a]" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-600">Phone Number</p>
-                          <p className="font-medium text-[#1e3a8a]">{verifiedVoter.phone}</p>
-                        </div>
+                    
+                    {/* Detailed Table */}
+                    <div className="border rounded-lg overflow-hidden bg-white shadow-sm mb-4">
+                      <div className="grid grid-cols-1 divide-y">
+                        {[
+                          { label: 'First Name', value: verifiedVoter?.firstName },
+                          { label: 'Surname', value: verifiedVoter?.surname },
+                          { label: 'County Name', value: verifiedVoter?.county },
+                          { label: 'Constituency', value: verifiedVoter?.constituency },
+                          { label: 'Ward Name', value: verifiedVoter?.ward },
+                          { label: 'Facility', value: verifiedVoter?.facility },
+                          { label: 'Polling Station', value: verifiedVoter?.station },
+                        ].map((item, index) => (
+                          <div key={item.label} className={`flex flex-col sm:flex-row sm:items-center ${
+                            index % 2 === 0 ? "bg-secondary/5" : "bg-white"
+                          }`}>
+                            <div className="px-3 py-1.5 sm:px-4 sm:py-2 sm:w-1/3 text-xs sm:text-sm font-medium text-muted-foreground sm:border-r break-words">
+                              {item.label}:
+                            </div>
+                            <div className="px-3 py-1.5 sm:px-4 sm:py-2 sm:w-2/3 text-sm font-bold text-foreground break-words">
+                              {item.value}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-4 text-center">
-                      If your details are incorrect, please contact KMPDU support to update your information.
-                    </p>
+
+                    {/* Support Notification Section */}
+                    <div className="mt-4">
+                      {!showSupportForm ? (
+                        <p className="text-[10px] sm:text-sm text-gray-600 text-center flex flex-col sm:block items-center gap-1">
+                          <span>Details incorrect?</span>
+                          <button
+                            onClick={() => setShowSupportForm(true)}
+                            className="text-[#1e3a8a] text-[10px] sm:text-sm hover:text-[#3b82f6] font-semibold underline inline-flex items-center gap-1 transition-colors"
+                          >
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="sm:hidden">Notify Support</span>
+                            <span className="hidden sm:inline">Notify KMPDU Support</span>
+                          </button>
+                        </p>
+                      ) : (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 animate-in slide-in-from-top-2">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
+                            <h4 className="font-semibold text-sm sm:text-base text-[#1e3a8a]">Report Incorrect Details</h4>
+                          </div>
+                          <form onSubmit={handleSupportSubmit} className="space-y-3">
+                            <div>
+                              <label htmlFor="supportReason" className="text-xs sm:text-sm font-medium text-gray-700 block mb-1">
+                                Please describe what information is incorrect:
+                              </label>
+                              <Textarea
+                                id="supportReason"
+                                value={supportReason}
+                                onChange={(e) => setSupportReason(e.target.value)}
+                                placeholder="E.g., My polling station should be Main Hall B, not Main Hall A..."
+                                className="min-h-[100px] resize-none"
+                                required
+                              />
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button
+                                type="submit"
+                                className="flex-1 bg-[#1e3a8a] hover:bg-[#3b82f6] text-white w-full h-8 sm:h-auto text-xs sm:text-sm"
+                                disabled={!supportReason.trim()}
+                              >
+                                <Send className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                                <span className="sm:hidden">Send</span>
+                                <span className="hidden sm:inline">Send Notification</span>
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowSupportForm(false);
+                                  setSupportReason('');
+                                }}
+                                className="border-gray-300 w-full sm:w-auto mt-0 sm:mt-0 h-8 sm:h-auto text-xs sm:text-sm"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </form>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -580,7 +675,7 @@ const Index = () => {
                     <div className="p-4 bg-red-50 rounded-xl text-center">
                       <p className="text-red-600 font-medium">{verificationError}</p>
                       <p className="text-sm text-gray-600 mt-2">
-                        Please check your membership number and try again.
+                        Please check your National ID number and try again.
                       </p>
                     </div>
                   </div>
@@ -591,105 +686,116 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6]">
+      <section className="py-12 sm:py-16 bg-gradient-to-r from-[#1e3a8a] to-[#3b82f6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-left">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">
                 Ready to Cast Your Vote
               </h2>
-              <p className="text-base text-white/90 max-w-xl">
+              <p className="text-sm sm:text-base text-white/90 max-w-xl mx-auto md:mx-0">
                 Join Thousands of KMPDU members who have already voted securely and Transparently.
               </p>
             </div>
-            <Link to="/login">
-              <Button size="lg" className="bg-white text-[#1e3a8a] hover:bg-gray-100 px-8 h-12 text-base font-semibold whitespace-nowrap">
-                Login to Vote Now
+            <Link to="/login" className="w-full md:w-auto">
+              <Button size="lg" className="bg-white text-[#1e3a8a] hover:bg-gray-100 w-full md:w-auto px-4 sm:px-8 h-10 sm:h-12 text-xs sm:text-base font-semibold whitespace-nowrap">
+                <span className="sm:hidden">Login to Vote</span>
+                <span className="hidden sm:inline">Login to Vote Now</span>
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      <footer id="contact" className="py-12 border-t border-gray-200 bg-white">
+      <footer id="contact" className="py-8 sm:py-12 border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-1">
               <Logo className="mb-4" />
-              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+              <p className="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">
                 Empowering democratic participation through secure, transparent, and blockchain-verified electronic voting for all KMPDU members.
               </p>
-
             </div>
             
             <div>
-              <h4 className="font-semibold text-[#1e3a8a] mb-4">Quick Links</h4>
+              <h4 className="font-semibold text-[#1e3a8a] mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Home</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">About Us</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Security</a></li>
-                <li><a href="#features" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Features</a></li>
-                <li><a href="#contact" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Contact</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Home</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">About Us</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Security</a></li>
+                <li><a href="#features" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Features</a></li>
+                <li><a href="#contact" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Contact</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold text-[#1e3a8a] mb-4">Support</h4>
+              <h4 className="font-semibold text-[#1e3a8a] mb-3 sm:mb-4 text-sm sm:text-base">Support</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Help Center</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Voting Guide</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">FAQs</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Help Center</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Voting Guide</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">FAQs</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">Terms of Service</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold text-[#1e3a8a] mb-4">Contact Us</h4>
+              <h4 className="font-semibold text-[#1e3a8a] mb-3 sm:mb-4 text-sm sm:text-base">Contact Us</h4>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 text-[#3b82f6] flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-600 text-sm">KMPDU Headquarters, Nairobi, Kenya</span>
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[#3b82f6] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-600 text-xs sm:text-sm">KMPDU Headquarters, Nairobi, Kenya</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Phone className="h-5 w-5 text-[#3b82f6] flex-shrink-0" />
-                  <a href="tel:+254700000000" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">+254 700 000 000</a>
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-[#3b82f6] flex-shrink-0" />
+                  <a href="tel:+254700000000" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">+254 700 000 000</a>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-[#3b82f6] flex-shrink-0" />
-                  <a href="mailto:support@kmpdu-evoting.ke" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-sm">support@kmpdu-evoting.ke</a>
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-[#3b82f6] flex-shrink-0" />
+                  <a href="mailto:support@kmpdu-evoting.ke" className="text-gray-600 hover:text-[#1e3a8a] transition-colors text-xs sm:text-sm">support@kmpdu-evoting.ke</a>
                 </li>
               </ul>
-              <div className="flex items-center gap-4 mt-6">
-                <a href="#" className="w-10 h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] hover:text-white transition-colors group">
-                  <svg className="w-5 h-5 text-[#1e3a8a] group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-3 sm:gap-4 mt-4 sm:mt-6">
+                <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] hover:text-white transition-colors group">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#1e3a8a] group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] hover:text-white transition-colors group">
-                  <svg className="w-5 h-5 text-[#1e3a8a] group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] hover:text-white transition-colors group">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#1e3a8a] group-hover:text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                   </svg>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] transition-colors group">
-                  <svg className="w-5 h-5 text-[#1e3a8a] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] transition-colors group">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#1e3a8a] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
                 </a>
-                <a href="mailto:support@kmpdu-evoting.ke" className="w-10 h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] transition-colors group">
-                  <Mail className="w-5 h-5 text-[#1e3a8a] group-hover:text-white" />
+                <a href="mailto:support@kmpdu-evoting.ke" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-[#1e3a8a] flex items-center justify-center hover:bg-[#1e3a8a] transition-colors group">
+                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-[#1e3a8a] group-hover:text-white" />
                 </a>
               </div>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-600 text-center">
+          <div className="pt-6 sm:pt-8 border-t border-gray-200">
+            <p className="text-xs sm:text-sm text-gray-600 text-center">
               © 2024 KMPDU. All rights reserved.
             </p>
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-[#1e3a8a] hover:bg-[#3b82f6] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 animate-in fade-in slide-in-from-bottom-4"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="h-5 w-5 sm:h-6 sm:w-6" />
+        </button>
+      )}
     </div>
   );
 };

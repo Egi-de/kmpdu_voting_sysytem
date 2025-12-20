@@ -12,33 +12,30 @@ export default function MemberNotifications() {
   return (
     <DashboardLayout title="Notifications">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Bell className="h-5 w-5 text-primary" />
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Notifications</h2>
-              <p className="text-sm text-muted-foreground">{unreadCount} unread messages</p>
+              <h2 className="text-base sm:text-lg font-semibold leading-tight">Notifications</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">{unreadCount} unread messages</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <CheckCheck className="h-4 w-4 mr-1" />
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs h-8 sm:h-9">
+              <CheckCheck className="h-3.5 w-3.5 mr-1.5" />
               Mark all read
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
         <Tabs defaultValue="all" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unread">Unread ({unreadCount})</TabsTrigger>
-            <TabsTrigger value="votes">Votes</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
+          <TabsList className="w-full overflow-x-auto justify-start h-auto p-1 bg-muted/50 scrollbar-hide flex-nowrap">
+            <TabsTrigger value="all" className="py-1.5 px-3 text-xs sm:text-sm whitespace-nowrap">All</TabsTrigger>
+            <TabsTrigger value="unread" className="py-1.5 px-3 text-xs sm:text-sm whitespace-nowrap">Unread ({unreadCount})</TabsTrigger>
+            <TabsTrigger value="votes" className="py-1.5 px-3 text-xs sm:text-sm whitespace-nowrap">Votes</TabsTrigger>
+            <TabsTrigger value="system" className="py-1.5 px-3 text-xs sm:text-sm whitespace-nowrap">System</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all">

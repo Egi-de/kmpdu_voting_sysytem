@@ -19,7 +19,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
         sidebarCollapsed ? "md:pl-20" : "md:pl-64"
       )}>
         <TopBar title={title} />
-        <main className="p-6">{children}</main>
+        <main className="p-2 sm:p-6">{children}</main>
       </div>
     </div>
   );

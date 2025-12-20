@@ -21,7 +21,6 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
 const memberNavItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/member' },
   { icon: Vote, label: 'Ballot', path: '/member/ballot' },
   { icon: Bell, label: 'Notifications', path: '/member/notifications' },
   { icon: Settings, label: 'Settings', path: '/member/settings' },
@@ -54,8 +53,8 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
   return (
     <>
       {/* Header */}
-      <div className="flex h-20 items-center justify-between px-4 border-b border-white/10 shrink-0">
-        {(!collapsed || isMobile) && <Logo variant="light" />}
+      <div className="flex h-16 sm:h-20 items-center justify-between px-3 sm:px-4 border-b border-white/10 shrink-0">
+        {(!collapsed || isMobile) && <div className="scale-75 sm:scale-100 origin-left"><Logo variant="light" /></div>}
         {!isMobile && onCollapse && (
           <Button
             variant="ghost"
@@ -69,15 +68,15 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-4 py-6 scrollbar-hide">
-        <ul className="space-y-2">
+      <nav className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 scrollbar-hide">
+        <ul className="space-y-1 sm:space-y-2">
           {navItems.map((item) => (
             <li key={item.path}>
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all',
+                    'flex items-center gap-2 sm:gap-3 rounded-lg px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium transition-all',
                     (collapsed && !isMobile) && 'justify-center px-2',
                     isActive
                       ? 'bg-[#2dd4bf] text-white shadow-lg'
@@ -85,7 +84,7 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
                   )
                 }
               >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <item.icon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                 {(!collapsed || isMobile) && <span>{item.label}</span>}
               </NavLink>
             </li>
@@ -94,31 +93,19 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
       </nav>
 
       {/* Footer */}
-      <div className="p-4 space-y-3 shrink-0">
-        {/* Level Switch for Members */}
-        {isMember && hasSelectedLevel && (
-          <Button
-            className={cn(
-              "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
-              (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
-            )}
-            onClick={() => requestLevelSwitch(selectedLevel === 'national' ? 'branch' : 'national')}
-          >
-            <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
-            {(!collapsed || isMobile) && `Switch to ${selectedLevel === 'national' ? 'Branch' : 'National'}`}
-          </Button>
-        )}
+      <div className="p-2 sm:p-4 space-y-2 sm:space-y-3 shrink-0">
+
 
         {/* Switch Role Button for Admin */}
         {user?.role === 'admin' && (
           <Button
             className={cn(
-              "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-12 rounded-lg font-medium",
-              (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
+              "w-full bg-[#1e5a52] hover:bg-[#2dd4bf] text-white border-0 h-10 sm:h-12 rounded-lg font-medium text-xs sm:text-sm shadow-none",
+              (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start px-2 sm:px-4"
             )}
             onClick={() => requestLevelSwitch(selectedLevel === 'branch' ? 'national' : 'branch')}
           >
-            <ClipboardList className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
+            <ClipboardList className={cn("h-4 w-4 sm:h-5 sm:w-5", (!collapsed || isMobile) && "mr-2 sm:mr-3")} />
             {(!collapsed || isMobile) && `Switch to ${selectedLevel === 'branch' ? 'National' : 'Branch'}`}
           </Button>
         )}
@@ -127,12 +114,12 @@ export function SidebarContent({ collapsed, onCollapse, isMobile = false }: Side
         <Button
           variant="ghost"
           className={cn(
-            "w-full text-gray-300 hover:bg-white/5 hover:text-white h-12 rounded-lg font-medium",
-            (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start"
+            "w-full text-gray-300 hover:bg-white/5 hover:text-white h-10 sm:h-12 rounded-lg font-medium text-xs sm:text-sm",
+            (collapsed && !isMobile) ? "px-2 justify-center" : "justify-start px-2 sm:px-4"
           )}
           onClick={logout}
         >
-          <LogOut className={cn("h-5 w-5", (!collapsed || isMobile) && "mr-3")} />
+          <LogOut className={cn("h-4 w-4 sm:h-5 sm:w-5", (!collapsed || isMobile) && "mr-2 sm:mr-3")} />
           {(!collapsed || isMobile) && "Logout"}
         </Button>
       </div>

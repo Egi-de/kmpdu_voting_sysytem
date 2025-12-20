@@ -39,6 +39,27 @@ export function VotingProvider({ children }: { children: ReactNode }) {
   const [voteReceipts, setVoteReceipts] = useState<VoteReceipt[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [selectedLevel, setSelectedLevel] = useState<VotingLevel>(null);
+
+  // Load voting history from localStorage when user changes
+  React.useEffect(() => {
+    if (user?.memberId) {
+      const storageKey = `kmpdu_vote_history_${user.memberId}`;
+      const history = localStorage.getItem(storageKey);
+      if (history) {
+        try {
+          const parsed = JSON.parse(history);
+          // Convert array back to record if needed, or assume it matches structure
+          setUserVotedPositions(parsed.votedPositions || {});
+        } catch (e) {
+          console.error("Failed to parse voting history", e);
+        }
+      } else {
+        setUserVotedPositions({});
+      }
+    } else {
+      setUserVotedPositions({});
+    }
+  }, [user?.memberId]);
   
   const hasSelectedLevel = selectedLevel !== null;
 
@@ -110,10 +131,22 @@ export function VotingProvider({ children }: { children: ReactNode }) {
     };
 
     // Update state - mark as voted (IMMUTABLE - cannot be undone)
-    setUserVotedPositions(prev => ({
-      ...prev,
+    const newVotedPositions = {
+      ...userVotedPositions,
       [positionId]: true,
-    }));
+    };
+    
+    setUserVotedPositions(newVotedPositions);
+
+    // Persist to localStorage
+    if (user?.memberId) {
+      const storageKey = `kmpdu_vote_history_${user.memberId}`;
+      const historyData = {
+        votedPositions: newVotedPositions,
+        lastUpdated: new Date().toISOString()
+      };
+      localStorage.setItem(storageKey, JSON.stringify(historyData));
+    }
 
     // Update vote counts
     setPositions(prev => prev.map(p => {

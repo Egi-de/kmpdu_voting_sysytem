@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, ArrowRight, Loader2, IdCard } from 'lucide-react';
 import { CountdownTimer } from '@/components/shared/CountdownTimer';
 import { toast } from 'react-toastify';
-import { cn } from '@/lib/utils';
+import { mockPositions } from '@/data/mockData';
 
 // Mock users database with expanded details for verification
 const mockUsersDB = [
@@ -75,18 +75,14 @@ const mockUsersDB = [
   },
 ];
 
-type LoginStep = 'credentials' | 'verification';
-
 export default function Login() {
   const [memberId, setMemberId] = useState('');
   const [nationalId, setNationalId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<LoginStep>('credentials');
-  const [verifiedUser, setVerifiedUser] = useState<typeof mockUsersDB[0] | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -99,52 +95,69 @@ export default function Login() {
     );
 
     if (user) {
-      // If user is admin, bypass verification step
-      if (user.role === 'admin') {
-        const userObj = {
-          id: user.memberId,
-          name: user.name,
-          email: `${user.memberId.toLowerCase().replace(/[^a-z0-9]/g, '')}@kmpdu.org`,
-          phone: user.phone,
-          role: user.role,
-          branch: user.branch,
-          memberId: user.memberId,
-        };
-        
-        login(userObj);
-        toast.success('Admin Login Successful!');
-        navigate('/admin');
-        setIsLoading(false);
-        return;
+      // Check if user has already completed voting
+      const storageKey = `kmpdu_vote_history_${user.memberId}`;
+      const history = localStorage.getItem(storageKey);
+      
+      let hasFinishedVoting = false;
+      
+      if (history) {
+        try {
+          const parsed = JSON.parse(history);
+          const votedPositions = parsed.votedPositions || {};
+          
+          // Calculate eligible positions for this user
+          const eligiblePositions = mockPositions.filter(p => {
+             // Basic active check
+             if (p.status !== 'active') return false;
+             
+             // National positions are for everyone
+             if (p.type === 'national') return true;
+             
+             // Branch positions must match user branch
+             if (p.type === 'branch' && p.branch === user.branch) return true;
+             
+             return false;
+          });
+          
+          // Check if voted for ALL eligible positions
+          const votedCount = eligiblePositions.filter(p => votedPositions[p.id]).length;
+          
+          if (eligiblePositions.length > 0 && votedCount >= eligiblePositions.length) {
+            hasFinishedVoting = true;
+          }
+          
+        } catch (e) {
+          console.error("Error checking voting history", e);
+        }
       }
 
-      setVerifiedUser(user);
-      setStep('verification');
-      toast.success('Identity Verified! Please confirm details.');
+      if (hasFinishedVoting) {
+         toast.info("You have already cast your votes. Please wait for the results.");
+         // Optionally redirect to landing page or just stay here
+         navigate('/');
+         return; 
+      }
+
+      // Create user object
+      const userObj = {
+        id: user.memberId,
+        name: user.name,
+        email: `${user.memberId.toLowerCase().replace(/[^a-z0-9]/g, '')}@kmpdu.org`,
+        phone: user.phone,
+        role: user.role,
+        branch: user.branch,
+        memberId: user.memberId,
+      };
+      
+      login(userObj);
+      toast.success('Login Successful! Entering voting dashboard...');
+      navigate(user.role === 'admin' ? '/admin' : '/member/ballot');
     } else {
       toast.error('Identity Verification Failed. Check credentials.');
     }
 
     setIsLoading(false);
-  };
-
-  const handleConfirmLogin = () => {
-    if (!verifiedUser) return;
-    
-    // Adapt mock user to User interface
-    const userObj = {
-      id: verifiedUser.memberId,
-      name: verifiedUser.name,
-      email: `${verifiedUser.memberId.toLowerCase().replace(/[^a-z0-9]/g, '')}@kmpdu.org`,
-      phone: verifiedUser.phone,
-      role: verifiedUser.role,
-      branch: verifiedUser.branch,
-      memberId: verifiedUser.memberId,
-    };
-    
-    login(userObj);
-    toast.success('Login Successful! Entering voting booth...');
-    navigate(verifiedUser.role === 'admin' ? '/admin' : '/member/ballot');
   };
 
   const electionEndDate = new Date('2024-12-05T18:00:00');
@@ -195,112 +208,56 @@ export default function Login() {
                 <IdCard className="h-8 w-8 text-primary" />
               </div>
               <CardTitle className="text-2xl font-bold text-foreground">
-                {step === 'credentials' ? 'Voter Identification' : 'Voter Verified'}
+                Voter Login
               </CardTitle>
               <CardDescription className="text-base">
-                {step === 'credentials' 
-                  ? 'Verify your identity to access the checkbox' 
-                  : 'Please confirm your details below'}
+                Enter your credentials to access the voting dashboard
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-8 px-6 sm:px-8">
-              {step === 'credentials' ? (
-                <form onSubmit={handleVerify} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="memberId" className="text-base font-medium">KMPDU Member ID</Label>
-                    <Input
-                      id="memberId"
-                      type="text"
-                      placeholder="e.g. KMPDU-2024-XXXXX"
-                      value={memberId}
-                      onChange={(e) => setMemberId(e.target.value)}
-                      className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="nationalId" className="text-base font-medium">National ID Number</Label>
-                    <Input
-                      id="nationalId"
-                      type="password"
-                      placeholder="Enter National ID"
-                      value={nationalId}
-                      onChange={(e) => setNationalId(e.target.value)}
-                      className="h-12 text-lg tracking-widest bg-secondary/5"
-                      required
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
-                    disabled={isLoading || !memberId || !nationalId}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        Verifying Records...
-                      </>
-                    ) : (
-                      <>
-                        Verify Identity
-                        <ArrowRight className="h-5 w-5" />
-                      </>
-                    )}
-                  </Button>
-                </form>
-              ) : (
-                <div className="space-y-6">
-                  {/* Detailed Table */}
-                  <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
-                    <div className="grid grid-cols-1 divide-y">
-                      {[
-                        { label: 'First Name', value: verifiedUser?.firstName },
-                        { label: 'Surname', value: verifiedUser?.surname },
-                        { label: 'County Name', value: verifiedUser?.county },
-                        { label: 'Constituency', value: verifiedUser?.constituency },
-                        { label: 'Ward Name', value: verifiedUser?.ward },
-                        { label: 'Facility', value: verifiedUser?.facility },
-                        { label: 'Polling Station', value: verifiedUser?.station },
-                      ].map((item, index) => (
-                        <div key={item.label} className={cn(
-                          "flex flex-col sm:flex-row sm:items-center",
-                          index % 2 === 0 ? "bg-secondary/5" : "bg-white"
-                        )}>
-                          <div className="px-4 py-2 sm:w-1/3 text-sm font-medium text-muted-foreground sm:border-r">
-                            {item.label}:
-                          </div>
-                          <div className="px-4 py-2 sm:w-2/3 text-sm font-bold text-foreground">
-                            {item.value}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                    <div className="flex flex-col gap-3">
-                      <Button 
-                        onClick={handleConfirmLogin} 
-                        className="w-full h-12 text-base font-semibold gap-2 shadow-md bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <Shield className="h-5 w-5" />
-                        Correct & Proceed
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setStep('credentials');
-                          setVerifiedUser(null);
-                          setNationalId('');
-                        }}
-                        className="w-full h-12 text-base border-destructive/20 text-destructive hover:bg-destructive/5 hover:text-destructive"
-                      >
-                        Not Me / Wrong Details
-                      </Button>
-                    </div>
-                  </div>
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="memberId" className="text-base font-medium">KMPDU Member ID</Label>
+                  <Input
+                    id="memberId"
+                    type="text"
+                    placeholder="e.g. KMPDU-2024-XXXXX"
+                    value={memberId}
+                    onChange={(e) => setMemberId(e.target.value)}
+                    className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
+                    required
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label htmlFor="nationalId" className="text-base font-medium">National ID Number</Label>
+                  <Input
+                    id="nationalId"
+                    type="password"
+                    placeholder="Enter National ID"
+                    value={nationalId}
+                    onChange={(e) => setNationalId(e.target.value)}
+                    className="h-12 text-lg tracking-widest bg-secondary/5"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+                  disabled={isLoading || !memberId || !nationalId}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    <>
+                      Login to Vote
+                      <ArrowRight className="h-5 w-5" />
+                    </>
+                  )}
+                </Button>
+              </form>
               
               <p className="mt-8 text-center text-xs text-muted-foreground">
                 Protected by end-to-end encryption. <br/>

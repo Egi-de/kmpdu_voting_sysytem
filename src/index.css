@@ -297,4 +297,29 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Chrome, Safari and Opera */
   }
+
+  /* Toast Responsiveness for 200px */
+  @media (max-width: 320px) {
+    .Toastify__toast-container {
+      width: 90vw !important;
+      left: 5vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .Toastify__toast {
+      min-height: 48px !important;
+      padding: 8px !important;
+      margin-bottom: 8px !important;
+      border-radius: 8px !important;
+    }
+    .Toastify__toast-body {
+      padding: 0 !important;
+      margin: 0 !important;
+      font-size: 11px !important;
+    }
+    .Toastify__toast-icon {
+      width: 16px !important;
+      margin-right: 6px !important;
+    }
+  }
 }
