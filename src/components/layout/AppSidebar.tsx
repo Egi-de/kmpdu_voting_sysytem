@@ -46,7 +46,7 @@ const superuserNavItems = [
 interface SidebarContentProps {
   collapsed?: boolean;
   onCollapse?: (collapsed: boolean) => void;
-  isMobile?: boolean; // New prop to handle mobile specific styling adjustments
+  isMobile?: boolean; 
 }
 
 export function SidebarContent({ collapsed, onCollapse, isMobile = false }: SidebarContentProps) {
