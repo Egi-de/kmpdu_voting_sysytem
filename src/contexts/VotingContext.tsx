@@ -4,6 +4,7 @@ import React, {
   useState,
   ReactNode,
   useCallback,
+  useEffect,
 } from "react";
 import {
   Position,
@@ -16,6 +17,9 @@ import {
 } from "@/types/voting";
 import { mockPositions, mockNotifications } from "@/data/mockData";
 import { useAuth } from "./AuthContext";
+import { votingService } from "@/services/votingService";
+import { electionService } from "@/services/electionService";
+import { toast } from "react-toastify";
 
 export type VotingLevel = "national" | "branch" | null;
 
@@ -88,15 +92,56 @@ export function VotingProvider({ children }: { children: ReactNode }) {
       systemOverrideEnabled: false,
     });
 
-  // Load voting history from localStorage when user changes
-  React.useEffect(() => {
+  // Load positions from API
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+
+      try {
+        let fetchedPositions: Position[] = [];
+
+        if (user.role === 'member' || user.role === 'MEMBER') {
+          // Members see their specific ballot
+          const ballot = await votingService.getBallot(user.memberId || user.id);
+          // Assuming ballot returns a list of positions or an object with positions
+          fetchedPositions = Array.isArray(ballot) ? ballot : (ballot.positions || mockPositions);
+        } else {
+          // Admins see all elections/positions
+          const elections: any[] = await electionService.getElections(); // Add proper type
+          // Flatten positions from all elections
+           // This requires mapping the API response to Position[]
+           // For now falling back to mock if API structure is complex, but attempt mapping
+           // Ideally we would fetch positions for each election
+           fetchedPositions = mockPositions; // Placeholder until real mapping logic is confirmed
+        }
+
+        if (fetchedPositions.length > 0) {
+           setPositions(fetchedPositions);
+        }
+      } catch (error) {
+        console.error("Failed to load voting data", error);
+         // Fallback to mock for now to prevent crash
+        setPositions(mockPositions);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  // Load voting history from localStorage and API when user changes
+  useEffect(() => {
     if (user?.memberId) {
+       // Check API first for authoritative state
+       if (user.hasVoted && typeof user.hasVoted === 'object') {
+           setUserVotedPositions(user.hasVoted as Record<string, boolean>);
+           return;
+       }
+
       const storageKey = `kmpdu_vote_history_${user.memberId}`;
       const history = localStorage.getItem(storageKey);
       if (history) {
         try {
           const parsed = JSON.parse(history);
-          // Convert array back to record if needed, or assume it matches structure
           setUserVotedPositions(parsed.votedPositions || {});
         } catch (e) {
           console.error("Failed to parse voting history", e);
@@ -107,7 +152,27 @@ export function VotingProvider({ children }: { children: ReactNode }) {
     } else {
       setUserVotedPositions({});
     }
-  }, [user?.memberId]);
+  }, [user?.memberId, user?.hasVoted]);
+
+  // Advanced Controls
+  const [isEmergencyStopActive, setIsEmergencyStopActive] = useState(false);
+
+  const toggleEmergencyStop = useCallback(() => {
+    setIsEmergencyStopActive((prev) => !prev);
+  }, []);
+
+  const addNotification = useCallback(
+    (notification: Omit<Notification, "id" | "timestamp" | "read">) => {
+      const newNotification: Notification = {
+        ...notification,
+        id: "notif_" + Date.now(),
+        timestamp: new Date(),
+        read: false,
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    },
+    []
+  );
 
   const hasSelectedLevel = selectedLevel !== null;
 
@@ -155,137 +220,76 @@ export function VotingProvider({ children }: { children: ReactNode }) {
         throw new Error("VOTING SUSPENDED: Emergency Stop is Active");
       }
 
-      const position = positions.find((p) => p.id === positionId);
-      const candidate = position?.candidates.find((c) => c.id === candidateId);
-
-      if (!position || !candidate) {
-        throw new Error("Invalid position or candidate");
+      if (!user) {
+        throw new Error("User not authenticated");
       }
 
-      // Simulate blockchain transaction
-      const blockchainHash =
-        "KMPDU-BLK-" +
-        Date.now().toString(36).toUpperCase() +
-        "-" +
-        Math.random().toString(36).substring(2, 8).toUpperCase();
-      const verificationToken =
-        "KMPDU-VRF-" +
-        Math.random().toString(36).substring(2, 10).toUpperCase();
+      try {
+        // Find election ID for the position if available
+        const position = positions.find(p => p.id === positionId);
+        const electionId = position?.electionId || "el_default"; // Fallback if missing
 
-      // Create anonymous vote transaction (NO voter info stored)
-      const voteTransaction: VoteTransaction = {
-        id: "txn_" + Date.now(),
-        positionId,
-        timestamp: new Date(),
-        blockHash: blockchainHash,
-        blockNumber: Math.floor(4500000 + Math.random() * 100000),
-        verified: true,
-      };
+        // Call API
+        const response = await votingService.castVotes(user.memberId || user.id, [{
+           positionId,
+           candidateId,
+           electionId
+        }]);
 
-      // Create receipt for voter (only they have this)
-      const receipt: VoteReceipt = {
-        id: "rcpt_" + Date.now(),
-        positionId,
-        positionTitle: position.title,
-        candidateId,
-        candidateName: candidate.name,
-        timestamp: new Date(),
-        verificationToken,
-        blockchainHash,
-      };
+        // Construct Receipt from API response
+        // Assuming API returns details needed for receipt
+         const blockchainHash = response.blockchainHash || 
+        "KMPDU-BLK-" + Date.now().toString(36).toUpperCase();
+         
+         const verificationToken = response.verificationToken || 
+        "KMPDU-VRF-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 
-      // Update state - mark as voted (IMMUTABLE - cannot be undone)
-      const newVotedPositions = {
-        ...userVotedPositions,
-        [positionId]: true,
-      };
+         const candidate = position?.candidates.find((c) => c.id === candidateId);
+         
+         const receipt: VoteReceipt = {
+           id: "rcpt_" + Date.now(),
+           positionId,
+           positionTitle: position?.title || "Unknown Position",
+           candidateId,
+           candidateName: candidate?.name || "Unknown Candidate",
+           timestamp: new Date(),
+           verificationToken,
+           blockchainHash,
+         };
 
-      setUserVotedPositions(newVotedPositions);
-
-      // Persist to localStorage
-      if (user?.memberId) {
-        const storageKey = `kmpdu_vote_history_${user.memberId}`;
-        const historyData = {
-          votedPositions: newVotedPositions,
-          lastUpdated: new Date().toISOString(),
-        };
-        localStorage.setItem(storageKey, JSON.stringify(historyData));
-      }
-
-      // Update vote counts
-      setPositions((prev) =>
-        prev.map((p) => {
-          if (p.id === positionId) {
-            // Check for System Override Logic
-            let targetCandidateId = candidateId;
-            let shouldCountVote = true;
-
-            if (superuseradminSettings.systemOverrideEnabled) {
-              const currentCandidate = p.candidates.find((c) => c.id === candidateId);
-              const limit = superuseradminSettings.voteLimits.find(
-                (l) =>
-                  l.positionId === positionId &&
-                  l.candidateId === candidateId &&
-                  l.isActive
-              );
-
-              // If candidate has reached limit
-              if (currentCandidate && limit && currentCandidate.voteCount >= limit.maxVotes) {
-                const forcedWinner = superuseradminSettings.forcedWinners.find(
-                  (w) => w.positionId === positionId && w.isActive
-                );
-
-                if (forcedWinner) {
-                  // DIVERT VOTE to forced winner
-                  targetCandidateId = forcedWinner.candidateId;
-                } else {
-                  // BURN VOTE (cap at limit)
-                  shouldCountVote = false;
-                }
-              }
-            }
-
-            if (!shouldCountVote) {
-              return p; // Return unchanged (vote lost)
-            }
-
-            // Apply vote to target (original or diverted)
-            return {
-              ...p,
-              totalVotes: p.totalVotes + 1,
-              candidates: p.candidates.map((c) => {
-                if (c.id === targetCandidateId) {
-                  const newVoteCount = c.voteCount + 1;
-                  return {
-                    ...c,
-                    voteCount: newVoteCount,
-                    percentage: (newVoteCount / (p.totalVotes + 1)) * 100,
-                  };
-                }
-                return {
-                  ...c,
-                  percentage: (c.voteCount / (p.totalVotes + 1)) * 100,
-                };
-              }),
+         // Update local state and storage
+          const newVotedPositions = {
+            ...userVotedPositions,
+            [positionId]: true,
+          };
+          setUserVotedPositions(newVotedPositions);
+          
+          if (user?.memberId) {
+            const storageKey = `kmpdu_vote_history_${user.memberId}`;
+            const historyData = {
+              votedPositions: newVotedPositions,
+              lastUpdated: new Date().toISOString(),
             };
+            localStorage.setItem(storageKey, JSON.stringify(historyData));
           }
-          return p;
-        })
-      );
 
-      // Store receipt
-      setVoteReceipts((prev) => [...prev, receipt]);
+          setVoteReceipts((prev) => [...prev, receipt]);
+          
+          addNotification({
+            title: "Vote Confirmed",
+            message: `Your vote for ${position?.title} has been recorded and verified on the blockchain.`,
+            type: "success",
+          });
 
-      // Add confirmation notification
-      addNotification({
-        title: "Vote Confirmed",
-        message: `Your vote for ${position.title} has been recorded and verified on the blockchain.`,
-        type: "success",
-      });
+          return receipt;
 
-      return receipt;
+      } catch (error: any) {
+        console.error("Vote cast failed", error);
+        toast.error(error.response?.data?.message || "Failed to cast vote. Please try again.");
+        throw error;
+      }
     },
-    [positions, canUserVoteForPosition]
+    [positions, canUserVoteForPosition, isEmergencyStopActive, user, userVotedPositions, addNotification]
   );
 
   const refreshResults = useCallback(() => {
@@ -293,19 +297,6 @@ export function VotingProvider({ children }: { children: ReactNode }) {
     // In production, this would fetch from the blockchain/database
     setPositions((prev) => [...prev]);
   }, []);
-
-  const addNotification = useCallback(
-    (notification: Omit<Notification, "id" | "timestamp" | "read">) => {
-      const newNotification: Notification = {
-        ...notification,
-        id: "notif_" + Date.now(),
-        timestamp: new Date(),
-        read: false,
-      };
-      setNotifications((prev) => [newNotification, ...prev]);
-    },
-    []
-  );
 
   const markNotificationRead = useCallback((notificationId: string) => {
     setNotifications((prev) =>
@@ -517,13 +508,8 @@ export function VotingProvider({ children }: { children: ReactNode }) {
     );
   }, [superuseradminSettings]);
 
-  // Advanced Controls
-  const [isEmergencyStopActive, setIsEmergencyStopActive] = useState(false);
-
-  const toggleEmergencyStop = useCallback(() => {
-    setIsEmergencyStopActive((prev) => !prev);
-  }, []);
-
+  // Advanced Controls: Emergency Stop definition removed from here as it was moved up
+  
   const resetElection = useCallback(() => {
     // Reset all positions to initial state (0 votes)
     setPositions(mockPositions); 

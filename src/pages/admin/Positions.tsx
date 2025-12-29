@@ -64,9 +64,13 @@ export default function AdminPositions() {
   const positions = allPositions.filter(p => {
     if (activeLevel === 'national') {
       return p.type === 'national';
-    } else {
-      return p.type === 'branch' && p.branch === user?.branch;
     }
+    
+    // Branch level logic
+    if (user?.branch === 'Headquarters' || user?.role === 'admin' || user?.role === 'superuseradmin') {
+      return p.type === 'branch';
+    }
+    return p.type === 'branch' && p.branch === user?.branch;
   });
 
   const handleCreatePosition = () => {

@@ -1,4 +1,4 @@
-export type UserRole = "member" | "admin" | "intern" | "superuseradmin";
+export type UserRole = "member" | "admin" | "intern" | "superuseradmin" | "MEMBER" | "ADMIN" | "SUPERUSERADMIN";
 
 export interface User {
   id: string;
@@ -9,7 +9,14 @@ export interface User {
   branch: string;
   memberId: string;
   avatar?: string;
-  hasVoted?: Record<string, boolean>; // Track voted positions by position ID
+  hasVoted?: Record<string, boolean> | boolean; // Track voted positions by position ID or boolean from API
+
+  // API spec fields
+  memberName?: string;
+  nationalId?: string;
+  mobileNumber?: string;
+  isActive?: boolean;
+
   // Additional verification details
   firstName?: string;
   surname?: string;
@@ -33,6 +40,7 @@ export interface Candidate {
 
 export interface Position {
   id: string;
+  electionId?: string; // Added for API linkage
   title: string;
   type: "national" | "branch";
   branch?: string;

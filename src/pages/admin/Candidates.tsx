@@ -257,7 +257,7 @@ export default function AdminCandidates() {
                   <Label htmlFor="name" className="max-sm:text-sm max-[250px]:text-xs">Full Name</Label>
                   <Input 
                     id="name" 
-                    placeholder="Dr. John Doe"
+                    placeholder="John Doe"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="max-sm:h-9 max-sm:text-sm max-sm:placeholder:text-xs max-[250px]:h-8 max-[250px]:text-xs max-[250px]:placeholder:text-[10px]"

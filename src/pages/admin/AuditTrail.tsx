@@ -49,8 +49,8 @@ const mockAuditLogs: AuditLog[] = [
     type: 'admin',
     action: 'Candidate Added',
     timestamp: new Date('2024-12-04T10:45:00'),
-    user: 'James Ochieng',
-    details: 'Added Dr. Mercy Korir as candidate for Secretary General',
+    user: 'Admin User',
+    details: 'Added Jane Smith as candidate for Secretary General',
   },
   {
     id: 'log_003',
@@ -72,7 +72,7 @@ const mockAuditLogs: AuditLog[] = [
     type: 'admin',
     action: 'Position Created',
     timestamp: new Date('2024-11-28T14:30:00'),
-    user: 'James Ochieng',
+    user: 'Admin User',
     details: 'Created Nairobi Branch Chairman position',
   },
   {

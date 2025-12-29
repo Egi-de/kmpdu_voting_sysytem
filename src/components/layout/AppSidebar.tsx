@@ -50,14 +50,14 @@ interface SidebarContentProps {
 }
 
 export function SidebarContent({ collapsed, onCollapse, isMobile = false }: SidebarContentProps) {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout } = useAuth();
   const { selectedLevel, requestLevelSwitch, hasSelectedLevel } = useVoting();
   
   let navItems = memberNavItems;
   if (user?.role === 'admin') navItems = adminNavItems;
   if (user?.role === 'superuseradmin') navItems = superuserNavItems;
 
-  const isMember = user?.role === 'member';
+  const isMember = (user?.role === 'member' || user?.role === 'MEMBER');
 
   return (
     <>

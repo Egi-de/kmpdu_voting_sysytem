@@ -1,37 +1,61 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, UserRole } from '@/types/voting';
-import { mockUser, mockAdminUser } from '@/data/mockData';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '@/types/voting';
+import { authService } from '@/services/authService';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (user: User) => void;
   logout: () => void;
-  switchRole: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('kmpdu_user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        try {
+          const apiUser = await authService.getProfile();
+          // Map API user
+           const userObj: any = {
+            id: apiUser.id || apiUser.memberId,
+            memberId: apiUser.memberId,
+            name: apiUser.memberName || apiUser.name,
+            email: apiUser.email || "",
+            phone: apiUser.mobileNumber || apiUser.phone,
+            role: apiUser.role?.toLowerCase() || "member",
+            branch: apiUser.branch,
+            hasVoted: apiUser.hasVoted,
+            isActive: apiUser.isActive
+          };
+          setUser(userObj);
+        } catch (error) {
+          console.error("Failed to restore session", error);
+          localStorage.removeItem('auth_token');
+          setUser(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, []);
 
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('kmpdu_user', JSON.stringify(userData));
+    // Token is already set in Login.tsx usually, or we can set it here if passed
   };
 
   const logout = () => {
+    authService.logout();
     setUser(null);
-    localStorage.removeItem('kmpdu_user');
-  };
-
-  const switchRole = () => {
-    if (user) {
-      setUser(user.role === 'admin' ? mockUser : mockAdminUser);
-    }
+    window.location.href = '/login';
   };
 
   return (
@@ -41,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         login,
         logout,
-        switchRole,
+        isLoading,
       }}
     >
       {children}

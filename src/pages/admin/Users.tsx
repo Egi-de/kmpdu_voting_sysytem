@@ -85,9 +85,9 @@ interface PendingRegistration {
 const initialUsers: SystemUser[] = [
   {
     id: '1',
-    name: 'Dr. John Mwangi',
+    name: 'John Doe',
     memberId: 'KMPDU-2024-00123',
-    email: 'john.mwangi@kmpdu.org',
+    email: 'john.doe@kmpdu.org',
     phone: '+254 712 345 678',
     branch: 'Nairobi Branch',
     status: 'active',
@@ -96,9 +96,9 @@ const initialUsers: SystemUser[] = [
   },
   {
     id: '2',
-    name: 'Dr. Jane Wanjiku',
+    name: 'Jane Smith',
     memberId: 'KMPDU-2024-00456',
-    email: 'jane.wanjiku@kmpdu.org',
+    email: 'jane.smith@kmpdu.org',
     phone: '+254 723 456 789',
     branch: 'Mombasa Branch',
     status: 'active',
@@ -107,9 +107,9 @@ const initialUsers: SystemUser[] = [
   },
   {
     id: '3',
-    name: 'Dr. Mary Akinyi',
+    name: 'Michael Johnson',
     memberId: 'KMPDU-2024-00789',
-    email: 'mary.akinyi@kmpdu.org',
+    email: 'michael.johnson@kmpdu.org',
     phone: '+254 745 678 901',
     branch: 'Kisumu Branch',
     status: 'inactive',
@@ -118,9 +118,9 @@ const initialUsers: SystemUser[] = [
   },
   {
     id: '4',
-    name: 'Dr. Samuel Kiprop',
+    name: 'Emily Davis',
     memberId: 'KMPDU-2024-01012',
-    email: 'samuel.kiprop@kmpdu.org',
+    email: 'emily.davis@kmpdu.org',
     phone: '+254 756 789 012',
     branch: 'Eldoret Branch',
     status: 'suspended',
@@ -601,7 +601,7 @@ export default function AdminUsers() {
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
-                  placeholder="Dr. John Doe"
+                  placeholder="John Doe"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="text-sm"

@@ -12,189 +12,86 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Shield, ArrowRight, Loader2, IdCard } from "lucide-react";
+import { Shield, ArrowRight, Loader2, IdCard, LockKeyhole } from "lucide-react";
 import { CountdownTimer } from "@/components/shared/CountdownTimer";
 import { toast } from "react-toastify";
-import { mockPositions } from "@/data/mockData";
-
-// Mock users database with expanded details for verification
-const mockUsersDB = [
-  {
-    memberId: "KMPDU-2024-00456",
-    password: "22334455",
-    role: "member" as const,
-    name: "Dr. Sarah Wanjiku",
-    firstName: "SARAH",
-    surname: "WANJIKU",
-    branch: "Nairobi Branch",
-    phone: "+254 7** ***456",
-    county: "NAIROBI",
-    constituency: "WESTLANDS",
-    ward: "PARKLANDS",
-    facility: "AGA KHAN UNIVERSITY HOSPITAL",
-    station: "MAIN HALL A",
-  },
-  {
-    memberId: "KMPDU-2024-00789",
-    password: "33445566",
-    role: "member" as const,
-    name: "Dr. John Mwangi",
-    firstName: "JOHN",
-    surname: "MWANGI",
-    branch: "Mombasa Branch",
-    phone: "+254 7** ***789",
-    county: "MOMBASA",
-    constituency: "MVITA",
-    ward: "TONONOKA",
-    facility: "COAST GENERAL HOSPITAL",
-    station: "ADMIN BLOCK B",
-  },
-  {
-    memberId: "KMPDU-ADM-001",
-    password: "admin123",
-    role: "admin" as const,
-    name: "James Ochieng",
-    firstName: "JAMES",
-    surname: "OCHIENG",
-    branch: "Headquarters",
-    phone: "+254 7** ***001",
-    county: "NAIROBI",
-    constituency: "KIBRA",
-    ward: "WOODLEY",
-    facility: "KMPDU HQ",
-    station: "ROOM 1",
-  },
-  {
-    memberId: "KMPDU-INT-001",
-    password: "11223344",
-    role: "intern" as const,
-    name: "Dr. Intern Jane",
-    firstName: "JANE",
-    surname: "MUTHONI",
-    branch: "Nairobi Branch",
-    phone: "+254 7** ***999",
-    county: "NAIROBI",
-    constituency: "LANGATA",
-    ward: "NAIROBI WEST",
-    facility: "KENYATTA NATIONAL HOSPITAL",
-    station: "INTERN BLOCK C",
-  },
-  {
-    memberId: "KMPDU-SUP-001",
-    password: "supersecret",
-    role: "superuseradmin" as const,
-    name: "Dr. Supreme Controller",
-    firstName: "SUPREME",
-    surname: "CONTROLLER",
-    branch: "Supreme Control Center",
-    phone: "+254 9** ***001",
-    county: "NAIROBI",
-    constituency: "KIBRA",
-    ward: "WOODLEY",
-    facility: "KMPDU HQ",
-    station: "CONTROL ROOM",
-  },
-];
+import { authService } from "@/services/authService";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 export default function Login() {
   const [memberId, setMemberId] = useState("");
   const [nationalId, setNationalId] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      await authService.login({ memberId, nationalId });
+      setStep("otp");
+      toast.info("OTP sent! Please enter the code.");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Login failed. Check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Find user in mock database
-    const user = mockUsersDB.find(
-      (u) =>
-        u.memberId.toLowerCase() === memberId.toLowerCase() &&
-        u.password === nationalId
-    );
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-    if (user) {
-      // Check if user has already completed voting
-      const storageKey = `kmpdu_vote_history_${user.memberId}`;
-      const history = localStorage.getItem(storageKey);
-
-      let hasFinishedVoting = false;
-
-      if (history) {
-        try {
-          const parsed = JSON.parse(history);
-          const votedPositions = parsed.votedPositions || {};
-
-          // Calculate eligible positions for this user
-          const eligiblePositions = mockPositions.filter((p) => {
-            // Basic active check
-            if (p.status !== "active") return false;
-
-            // National positions are for everyone
-            if (p.type === "national") return true;
-
-            // Branch positions must match user branch
-            if (p.type === "branch" && p.branch === user.branch) return true;
-
-            return false;
-          });
-
-          // Check if voted for ALL eligible positions
-          const votedCount = eligiblePositions.filter(
-            (p) => votedPositions[p.id]
-          ).length;
-
-          if (
-            eligiblePositions.length > 0 &&
-            votedCount >= eligiblePositions.length
-          ) {
-            hasFinishedVoting = true;
-          }
-        } catch (e) {
-          console.error("Error checking voting history", e);
-        }
+    try {
+      const response = await authService.verifyOtp({ memberId, otp });
+      
+      // Store token
+      if (response.token) {
+        localStorage.setItem('auth_token', response.token);
       }
 
-      if (hasFinishedVoting) {
-        toast.info(
-          "You have already cast your votes. Please wait for the results."
-        );
-        // Optionally redirect to landing page or just stay here
-        navigate("/");
-        return;
-      }
-
-      // Create user object
-      const userObj = {
-        id: user.memberId,
-        name: user.name,
-        email: `${user.memberId
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, "")}@kmpdu.org`,
-        phone: user.phone,
-        role: user.role,
-        branch: user.branch,
-        memberId: user.memberId,
+      // Map API user to App user format
+      const apiUser = response.user || response; // Adjust based on actual response structure
+      const userObj: any = {
+        id: apiUser.id || apiUser.memberId,
+        memberId: apiUser.memberId,
+        name: apiUser.memberName || apiUser.name,
+        email: apiUser.email || "",
+        phone: apiUser.mobileNumber || apiUser.phone,
+        role: apiUser.role?.toLowerCase() || "member",
+        branch: apiUser.branch,
+        hasVoted: apiUser.hasVoted,
+        isActive: apiUser.isActive
       };
 
       login(userObj);
-      toast.success("Login Successful! Entering voting dashboard...");
-      if (user.role === "superuseradmin") {
+      toast.success("Login Successful!");
+
+      // Redirect based on role
+      const role = userObj.role.toLowerCase();
+      if (role === "superuseradmin") {
         navigate("/superuseradmin");
-      } else if (user.role === "admin") {
+      } else if (role === "admin") {
         navigate("/admin");
       } else {
         navigate("/member/ballot");
       }
-    } else {
-      toast.error("Identity Verification Failed. Check credentials.");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Invalid OTP.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const electionEndDate = new Date("2024-12-05T18:00:00");
@@ -246,63 +143,120 @@ export default function Login() {
           <Card className="border-0 shadow-lg overflow-hidden">
             <CardHeader className="text-center pb-6 bg-secondary/10">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-sm">
-                <IdCard className="h-8 w-8 text-primary" />
+                {step === 'credentials' ? <IdCard className="h-8 w-8 text-primary" /> : <LockKeyhole className="h-8 w-8 text-primary" />}
               </div>
               <CardTitle className="text-2xl font-bold text-foreground">
-                Voter Login
+                {step === 'credentials' ? 'Voter Login' : 'Enter One-Time Password'}
               </CardTitle>
               <CardDescription className="text-base">
-                Enter your credentials to access the voting dashboard
+                {step === 'credentials' 
+                  ? 'Enter your credentials to access the voting dashboard' 
+                  : 'We sent a code to your registered mobile number'}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-8 px-6 sm:px-8">
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="memberId" className="text-base font-medium">
-                    KMPDU Member ID
-                  </Label>
-                  <Input
-                    id="memberId"
-                    type="text"
-                    placeholder="e.g. KMPDU-2024-XXXXX"
-                    value={memberId}
-                    onChange={(e) => setMemberId(e.target.value)}
-                    className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="nationalId" className="text-base font-medium">
-                    National ID Number
-                  </Label>
-                  <Input
-                    id="nationalId"
-                    type="password"
-                    placeholder="Enter National ID"
-                    value={nationalId}
-                    onChange={(e) => setNationalId(e.target.value)}
-                    className="h-12 text-lg tracking-widest bg-secondary/5"
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
-                  disabled={isLoading || !memberId || !nationalId}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    <>
-                      Login to Vote
-                      <ArrowRight className="h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </form>
+              {step === 'credentials' ? (
+                <form onSubmit={handleCredentialsSubmit} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="memberId" className="text-base font-medium">
+                      KMPDU Member ID
+                    </Label>
+                    <Input
+                      id="memberId"
+                      type="text"
+                      placeholder="e.g. KMPDU-2024-XXXXX"
+                      value={memberId}
+                      onChange={(e) => setMemberId(e.target.value)}
+                      className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="nationalId" className="text-base font-medium">
+                      National ID Number
+                    </Label>
+                    <Input
+                      id="nationalId"
+                      type="password"
+                      placeholder="Enter National ID"
+                      value={nationalId}
+                      onChange={(e) => setNationalId(e.target.value)}
+                      className="h-12 text-lg tracking-widest bg-secondary/5"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+                    disabled={isLoading || !memberId || !nationalId}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        Continue
+                        <ArrowRight className="h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleOtpSubmit} className="space-y-8">
+                  <div className="flex justify-center">
+                    <InputOTP 
+                      maxLength={6} 
+                      value={otp} 
+                      onChange={(value) => setOtp(value)}
+                      disabled={isLoading}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} className="h-12 w-12 text-lg" />
+                        <InputOTPSlot index={1} className="h-12 w-12 text-lg" />
+                        <InputOTPSlot index={2} className="h-12 w-12 text-lg" />
+                      </InputOTPGroup>
+                      <div className="w-4"></div>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} className="h-12 w-12 text-lg" />
+                        <InputOTPSlot index={4} className="h-12 w-12 text-lg" />
+                        <InputOTPSlot index={5} className="h-12 w-12 text-lg" />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-all"
+                    disabled={isLoading || otp.length < 6}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Verifying OTP...
+                      </>
+                    ) : (
+                      <>
+                        Login to Vote
+                        <ArrowRight className="h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                  
+                  <div className="text-center">
+                    <button 
+                      type="button" 
+                      onClick={() => setStep("credentials")}
+                      className="text-sm text-muted-foreground hover:text-primary underline"
+                    >
+                      Back to login
+                    </button>
+                  </div>
+                </form>
+              )}
 
               <p className="mt-8 text-center text-xs text-muted-foreground">
                 Protected by end-to-end encryption. <br />
