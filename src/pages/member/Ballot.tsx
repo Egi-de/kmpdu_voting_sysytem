@@ -162,6 +162,12 @@ export default function Ballot() {
       }
 
       setPhase(nextPhase);
+      
+      // If completed, set persistent flag for this user
+      if (nextPhase === "completed" && user?.memberId) {
+          localStorage.setItem(`kmpdu_vote_status_${user.memberId}`, 'completed');
+      }
+
       handlePhaseCompletion();
     }
   }, [

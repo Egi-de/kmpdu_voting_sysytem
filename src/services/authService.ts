@@ -26,6 +26,12 @@ export const authService = {
     if (!data.memberId) {
        throw { response: { data: { message: "Member ID is required" } } };
     }
+
+    // Check if user has already voted (Simulation)
+    const voteStatus = localStorage.getItem(`kmpdu_vote_status_${data.memberId}`);
+    if (voteStatus === 'completed') {
+       throw { response: { data: { message: "Access Denied: You have already cast your vote." } } };
+    }
     
     return { success: true, message: "OTP sent" };
   },
@@ -41,6 +47,9 @@ export const authService = {
         user = mockSuperuseradminUser;
     }
 
+    // Store user session for persistence
+    localStorage.setItem('kmpdu_user_session', JSON.stringify(user));
+
     return {
       token: "mock_jwt_token_" + Math.random().toString(36).substring(7),
       user: user
@@ -49,10 +58,22 @@ export const authService = {
 
   getProfile: async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Restore user session from localStorage
+    const sessionData = localStorage.getItem('kmpdu_user_session');
+    if (sessionData) {
+      try {
+        return JSON.parse(sessionData);
+      } catch (e) {
+        console.error('Failed to parse user session', e);
+      }
+    }
+    
     return mockUser; 
   },
 
   logout: () => {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('kmpdu_user_session');
   },
 };
