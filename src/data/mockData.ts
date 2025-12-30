@@ -434,6 +434,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 1,
   },
   {
     id: "pos_002",
@@ -445,6 +446,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 2,
   },
   {
     id: "pos_003",
@@ -456,6 +458,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 3,
   },
   {
     id: "pos_004",
@@ -467,6 +470,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 4,
   },
   {
     id: "pos_005",
@@ -478,6 +482,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 5,
   },
   {
     id: "pos_006",
@@ -489,6 +494,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 6,
   },
 
   // Branch Positions (Nairobi)
@@ -503,6 +509,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 1,
   },
   {
     id: "pos_008",
@@ -515,6 +522,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 2,
   },
   {
     id: "pos_009",
@@ -527,6 +535,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 3,
   },
   {
     id: "pos_010",
@@ -539,6 +548,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 4,
   },
   {
     id: "pos_011",
@@ -551,6 +561,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 5,
   },
   {
     id: "pos_012",
@@ -563,6 +574,7 @@ export const mockPositions: Position[] = [
     status: "active",
     startTime: new Date("2026-12-01T08:00:00"),
     endTime: new Date("2026-12-05T18:00:00"),
+    order: 6,
   },
 ];
 

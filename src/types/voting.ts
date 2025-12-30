@@ -52,6 +52,7 @@ export interface Position {
   endTime: Date;
   winnerId?: string; // Announced winner
   winnerVotes?: number; // Final assigned votes
+  order: number;
 }
 
 export interface Branch {

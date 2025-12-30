@@ -109,7 +109,7 @@ export default function Ballot() {
         );
       return false;
     })
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .sort((a, b) => a.order - b.order);
 
   const currentPosition = currentPositions[currentIndex];
 
