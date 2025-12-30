@@ -81,8 +81,7 @@ interface PendingRegistration {
   createdAt: Date;
 }
 
-// Mock users data - Only members (admins are managed separately)
-// Mock users data - Only members (admins are managed separately)
+// Mock users data for testing purposes
 const initialUsers: SystemUser[] = [
   { id: '1', name: 'James Kamau', memberId: 'KMPDU-2026-00001', nationalId: '22345678', phone: '+254 711 100 001', branch: 'Nairobi Branch', status: 'active', createdAt: '2026-01-10', lastLogin: null },
   { id: '2', name: 'Sarah Ochieng', memberId: 'KMPDU-2026-00002', nationalId: '23456789', phone: '+254 722 200 002', branch: 'Nairobi Branch', status: 'active', createdAt: '2026-01-11', lastLogin: null },

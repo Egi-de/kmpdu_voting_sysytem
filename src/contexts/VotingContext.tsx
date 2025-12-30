@@ -112,7 +112,8 @@ export function VotingProvider({ children }: { children: ReactNode }) {
         } else {
           // Admins see all elections/positions
           try {
-             const elections: any[] = await electionService.getElections();
+             // Fetch elections via API
+             await electionService.getElections();
              // Ideally map elections to positions here. 
              // For now, if API works but returns structure we don't handle yet, or fails:
              fetchedPositions = mockPositions; 
@@ -238,7 +239,7 @@ export function VotingProvider({ children }: { children: ReactNode }) {
       const candidate = position?.candidates.find((c) => c.id === candidateId);
       const electionId = position?.electionId || "el_default";
 
-      let response: any = {};
+      let response: Partial<VoteReceipt> = {};
       let isOfflineFallback = false;
 
       try {
@@ -248,7 +249,7 @@ export function VotingProvider({ children }: { children: ReactNode }) {
            candidateId,
            electionId
         }]);
-      } catch (error: any) {
+      } catch (error) {
         console.warn("API Vote failed, falling back to local simulation.", error);
         isOfflineFallback = true;
         // Proceed with local simulation instead of throwing
