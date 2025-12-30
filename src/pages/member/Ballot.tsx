@@ -248,8 +248,43 @@ export default function Ballot() {
         }
       }
 
+      // Explicitly handle transition to prevent "return to edit" lag
+      const branchPositions = allPositions.filter(
+        (p) =>
+          p.type === "branch" &&
+          p.status === "active" &&
+          p.branch === user?.branch
+      );
+      
+      let performSwitch = false;
+      let nextPhase: VotingPhase = phase;
+
+      if (phase === "national") {
+         if (branchPositions.length > 0) {
+            nextPhase = "branch";
+            toast.info(
+              <div>
+                <strong>National Stage Complete</strong>
+                <p className="text-sm mt-1">Proceeding to your branch elections.</p>
+              </div>
+            );
+         } else {
+            nextPhase = "completed";
+         }
+         performSwitch = true;
+      } else if (phase === "branch") {
+         nextPhase = "completed";
+         performSwitch = true;
+      }
+
       setShowConfirmDialog(false);
       setIsEditingFromReview(false);
+
+      if (performSwitch && nextPhase !== phase) {
+          setPhase(nextPhase);
+          handlePhaseCompletion();
+      }
+
     } catch (error) {
       toast.error("Failed to submit votes. Please try again.");
       console.error(error);
