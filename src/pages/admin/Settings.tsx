@@ -61,7 +61,7 @@ export default function Settings() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="electionName">Election Name</Label>
-                  <Input id="electionName" defaultValue="KMPDU 2024 National Elections" />
+                  <Input id="electionName" defaultValue="KMPDU 2026 National Elections" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="orgName">Organization Name</Label>
@@ -268,11 +268,11 @@ export default function Settings() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Election Start</Label>
-                  <Input type="datetime-local" defaultValue="2024-12-01T08:00" />
+                  <Input type="datetime-local" defaultValue="2026-12-01T08:00" />
                 </div>
                 <div className="space-y-2">
                   <Label>Election End</Label>
-                  <Input type="datetime-local" defaultValue="2024-12-05T18:00" />
+                  <Input type="datetime-local" defaultValue="2026-12-05T18:00" />
                 </div>
               </div>
               <Separator />

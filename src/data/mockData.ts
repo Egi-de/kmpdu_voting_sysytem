@@ -14,7 +14,7 @@ export const mockUser: User = {
   phone: "+254 712 345 678",
   role: "member",
   branch: "Nairobi Branch",
-  memberId: "KMPDU-2024-00456",
+  memberId: "KMPDU-2026-00456",
   avatar: undefined,
   firstName: "JOHN",
   surname: "DOE",
@@ -27,7 +27,7 @@ export const mockUser: User = {
 
 // Additional mock voters for testing
 export const mockVoters: Record<string, User> = {
-  "22334455": mockUser, // John Doe
+  "22334455": mockUser, 
   "33445566": {
     id: "usr_002",
     name: "Jane Smith",
@@ -35,7 +35,7 @@ export const mockVoters: Record<string, User> = {
     phone: "+254 722 456 789",
     role: "member",
     branch: "Mombasa Branch",
-    memberId: "KMPDU-2024-00789",
+    memberId: "KMPDU-2026-00789",
     avatar: undefined,
     firstName: "JANE",
     surname: "SMITH",
@@ -52,7 +52,7 @@ export const mockVoters: Record<string, User> = {
     phone: "+254 733 567 890",
     role: "member",
     branch: "Kisumu Branch",
-    memberId: "KMPDU-2024-01234",
+    memberId: "KMPDU-2026-01234",
     avatar: undefined,
     firstName: "ROBERT",
     surname: "JOHNSON",
@@ -69,7 +69,7 @@ export const mockVoters: Record<string, User> = {
     phone: "+254 744 678 901",
     role: "intern",
     branch: "Nakuru Branch",
-    memberId: "KMPDU-2024-02456",
+    memberId: "KMPDU-2026-02456",
     avatar: undefined,
     firstName: "MICHAEL",
     surname: "BROWN",
@@ -86,7 +86,7 @@ export const mockVoters: Record<string, User> = {
     phone: "+254 755 789 012",
     role: "member",
     branch: "Eldoret Branch",
-    memberId: "KMPDU-2024-03678",
+    memberId: "KMPDU-2026-03678",
     avatar: undefined,
     firstName: "EMILY",
     surname: "DAVIS",
@@ -432,8 +432,8 @@ export const mockPositions: Position[] = [
     totalVotes: 9400,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_002",
@@ -443,8 +443,8 @@ export const mockPositions: Position[] = [
     totalVotes: 8600,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_003",
@@ -454,8 +454,8 @@ export const mockPositions: Position[] = [
     totalVotes: 9400,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_004",
@@ -465,8 +465,8 @@ export const mockPositions: Position[] = [
     totalVotes: 7000,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_005",
@@ -476,8 +476,8 @@ export const mockPositions: Position[] = [
     totalVotes: 9400,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_006",
@@ -487,8 +487,8 @@ export const mockPositions: Position[] = [
     totalVotes: 7000,
     eligibleVoters: 12000,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
 
   // Branch Positions (Nairobi)
@@ -501,8 +501,8 @@ export const mockPositions: Position[] = [
     totalVotes: 3616,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_008",
@@ -513,8 +513,8 @@ export const mockPositions: Position[] = [
     totalVotes: 3000,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_009",
@@ -525,8 +525,8 @@ export const mockPositions: Position[] = [
     totalVotes: 3616,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_010",
@@ -537,8 +537,8 @@ export const mockPositions: Position[] = [
     totalVotes: 2900,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_011",
@@ -549,8 +549,8 @@ export const mockPositions: Position[] = [
     totalVotes: 3616,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
   {
     id: "pos_012",
@@ -561,8 +561,8 @@ export const mockPositions: Position[] = [
     totalVotes: 2800,
     eligibleVoters: 4520,
     status: "active",
-    startTime: new Date("2024-12-01T08:00:00"),
-    endTime: new Date("2024-12-05T18:00:00"),
+    startTime: new Date("2026-12-01T08:00:00"),
+    endTime: new Date("2026-12-05T18:00:00"),
   },
 ];
 
@@ -581,7 +581,7 @@ export const mockNotifications: Notification[] = [
     title: "Vote Confirmed",
     message: "Your vote for Secretary General has been recorded successfully.",
     type: "success",
-    timestamp: new Date("2024-12-04T10:30:00"),
+    timestamp: new Date("2026-12-04T10:30:00"),
     read: false,
   },
   {
@@ -590,15 +590,15 @@ export const mockNotifications: Notification[] = [
     message:
       "National voting closes in 1 day 6 hours. Don't forget to cast your vote!",
     type: "warning",
-    timestamp: new Date("2024-12-04T09:00:00"),
+    timestamp: new Date("2026-12-04T09:00:00"),
     read: false,
   },
   {
     id: "notif_003",
     title: "Election Started",
-    message: "The KMPDU 2024 National Elections have officially begun.",
+    message: "The KMPDU 2026 National Elections have officially begun.",
     type: "info",
-    timestamp: new Date("2024-12-01T08:00:00"),
+    timestamp: new Date("2026-12-01T08:00:00"),
     read: true,
   },
 ];
@@ -609,7 +609,7 @@ export const mockAdminNotifications: Notification[] = [
     title: "High Turnout Alert",
     message: "Nairobi Branch has exceeded 80% voter turnout.",
     type: "success",
-    timestamp: new Date("2024-12-04T11:00:00"),
+    timestamp: new Date("2026-12-04T11:00:00"),
     read: false,
   },
   {
@@ -617,7 +617,7 @@ export const mockAdminNotifications: Notification[] = [
     title: "System Health",
     message: "All voting nodes are operational. No anomalies detected.",
     type: "info",
-    timestamp: new Date("2024-12-04T10:00:00"),
+    timestamp: new Date("2026-12-04T10:00:00"),
     read: false,
   },
   {
@@ -625,7 +625,7 @@ export const mockAdminNotifications: Notification[] = [
     title: "Candidate Upload",
     message: "New candidate added to Mombasa Branch Secretary position.",
     type: "info",
-    timestamp: new Date("2024-12-03T15:30:00"),
+    timestamp: new Date("2026-12-03T15:30:00"),
     read: true,
   },
 ];

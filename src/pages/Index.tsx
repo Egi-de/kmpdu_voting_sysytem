@@ -82,13 +82,10 @@ const Index = () => {
       return;
     }
 
-    // Set loading state
     setIsVerifying(true);
 
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Mock verification - in production this would check against a database
     const foundVoter = mockVoters[verificationNumber];
     
     if (foundVoter) {
@@ -109,7 +106,6 @@ const Index = () => {
   const handleSaveChanges = () => {
     if (!editedVoter) return;
     
-    // In production, this would update the database
     setVerifiedVoter(editedVoter);
     setIsEditMode(false);
     alert('Voter details updated successfully!');
@@ -129,10 +125,8 @@ const Index = () => {
     e.preventDefault();
     if (!supportReason.trim()) return;
     
-    // In production, this would send the notification to KMPDU support
     alert(`Support notification sent!\n\nReason: ${supportReason}\n\nKMPDU support will contact you shortly.`);
     
-    // Reset form
     setSupportReason('');
     setShowSupportForm(false);
   };
@@ -495,7 +489,7 @@ const Index = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Timestamp</span>
-                        <span className="text-[#1e3a8a] font-semibold">2024-03-15 14:32:01</span>
+                        <span className="text-[#1e3a8a] font-semibold">2026-03-15 14:32:01</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Status</span>
@@ -767,7 +761,7 @@ const Index = () => {
           
           <div className="pt-6 sm:pt-8 border-t border-gray-200">
             <p className="text-xs sm:text-sm text-gray-600 text-center">
-              © 2024 KMPDU. All rights reserved.
+              © 2026 KMPDU. All rights reserved.
             </p>
           </div>
         </div>

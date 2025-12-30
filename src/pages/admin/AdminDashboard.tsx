@@ -64,9 +64,9 @@ export default function AdminDashboard() {
             </div>
             <h2 className="text-xl sm:text-2xl font-bold truncate">
               <span className="xs:hidden">Elections</span>
-              <span className="hidden xs:inline">KMPDU 2024 National Elections</span>
+              <span className="hidden xs:inline">KMPDU 2026 National Elections</span>
             </h2>
-            <p className="text-sm text-white/80 mt-1.5 font-medium">Started Dec 1, 2024 • Ends Dec 5, 2024</p>
+            <p className="text-sm text-white/80 mt-1.5 font-medium">Started Dec 1, 2026 • Ends Dec 5, 2026</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Button variant="secondary" size="default" className="gap-2 flex-1 sm:flex-none font-bold shadow-sm h-10">

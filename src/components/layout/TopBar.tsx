@@ -15,7 +15,7 @@ import { MobileSidebar } from './MobileSidebar';
 export function TopBar({ title }: TopBarProps) {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
-  const electionEndDate = new Date('2024-12-05T18:00:00');
+  const electionEndDate = new Date('2026-12-05T18:00:00');
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');

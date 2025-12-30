@@ -94,7 +94,7 @@ export default function Login() {
     }
   };
 
-  const electionEndDate = new Date("2024-12-05T18:00:00");
+  const electionEndDate = new Date("2026-12-05T18:00:00");
 
   return (
     <div className="force-light min-h-screen flex">
@@ -108,7 +108,7 @@ export default function Login() {
           <div className="space-y-8">
             <div>
               <h1 className="text-4xl font-bold leading-tight">
-                KMPDU 2024
+                KMPDU 2026
                 <br />
                 National Elections
               </h1>
@@ -164,7 +164,7 @@ export default function Login() {
                     <Input
                       id="memberId"
                       type="text"
-                      placeholder="e.g. KMPDU-2024-XXXXX"
+                      placeholder="e.g. KMPDU-2026-XXXXX"
                       value={memberId}
                       onChange={(e) => setMemberId(e.target.value)}
                       className="h-12 text-lg font-mono tracking-wide bg-secondary/5"
@@ -260,7 +260,7 @@ export default function Login() {
 
               <p className="mt-8 text-center text-xs text-muted-foreground">
                 Protected by end-to-end encryption. <br />
-                KMPDU Electoral Commission © 2024
+                KMPDU Electoral Commission © 2026
               </p>
             </CardContent>
           </Card>

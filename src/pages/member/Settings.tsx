@@ -395,7 +395,7 @@ export default function MemberSettings() {
                     <div>
                       <p className="text-sm font-medium">Password Changed</p>
                       <p className="text-xs text-muted-foreground">
-                        December 1, 2024 at 10:30 AM
+                        December 1, 2026 at 10:30 AM
                       </p>
                     </div>
                     <CheckCircle2 className="h-5 w-5 text-emerald-500" />
