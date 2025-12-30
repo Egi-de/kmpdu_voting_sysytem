@@ -60,7 +60,7 @@ interface SystemUser {
   id: string;
   name: string;
   memberId: string;
-  email: string;
+  nationalId: string;
   phone: string;
   branch: string;
   status: 'pending' | 'active' | 'inactive' | 'suspended';
@@ -72,10 +72,10 @@ interface PendingRegistration {
   id: string;
   type: 'member' | 'candidate';
   name: string;
-  email: string;
+  nationalId: string;
   phone: string;
   branch: string;
-  memberId?: string;
+  memberId: string;
   position?: string;
   status: 'pending' | 'sent' | 'confirmed';
   createdAt: Date;
@@ -87,7 +87,7 @@ const initialUsers: SystemUser[] = [
     id: '1',
     name: 'John Doe',
     memberId: 'KMPDU-2026-00123',
-    email: 'john.doe@kmpdu.org',
+    nationalId: '12345678',
     phone: '+254 712 345 678',
     branch: 'Nairobi Branch',
     status: 'active',
@@ -98,7 +98,7 @@ const initialUsers: SystemUser[] = [
     id: '2',
     name: 'Jane Smith',
     memberId: 'KMPDU-2026-00456',
-    email: 'jane.smith@kmpdu.org',
+    nationalId: '87654321',
     phone: '+254 723 456 789',
     branch: 'Mombasa Branch',
     status: 'active',
@@ -109,7 +109,7 @@ const initialUsers: SystemUser[] = [
     id: '3',
     name: 'Michael Johnson',
     memberId: 'KMPDU-2026-00789',
-    email: 'michael.johnson@kmpdu.org',
+    nationalId: '11223344',
     phone: '+254 745 678 901',
     branch: 'Kisumu Branch',
     status: 'inactive',
@@ -120,7 +120,7 @@ const initialUsers: SystemUser[] = [
     id: '4',
     name: 'Emily Davis',
     memberId: 'KMPDU-2026-01012',
-    email: 'emily.davis@kmpdu.org',
+    nationalId: '44332211',
     phone: '+254 756 789 012',
     branch: 'Eldoret Branch',
     status: 'suspended',
@@ -150,19 +150,14 @@ export default function AdminUsers() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    memberId: '',
+    nationalId: '',
     phone: '',
     branch: '',
     status: 'pending' as 'pending' | 'active' | 'inactive' | 'suspended',
   });
 
-  const generateMemberId = () => {
-    const year = new Date().getFullYear();
-    const randomNum = Math.floor(10000 + Math.random() * 90000);
-    const memberId = `KMPDU-${year}-${randomNum}`;
-    setGeneratedMemberId(memberId);
-    return memberId;
-  };
+
 
   const generatePassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
@@ -175,9 +170,8 @@ export default function AdminUsers() {
   };
 
   const regenerateCredentials = () => {
-    generateMemberId();
     generatePassword();
-    toast.success("Credentials Regenerated: New membership number and password.");
+    toast.success("Credentials Regenerated: New password.");
   };
 
   const copyToClipboard = (text: string, type: 'memberId' | 'password') => {
@@ -188,7 +182,7 @@ export default function AdminUsers() {
   };
 
   const copyAllCredentials = () => {
-    const credentials = `KMPDU Membership Credentials\n\nMembership Number: ${generatedMemberId}\nTemporary Password: ${generatedPassword}\n\nPlease change your password after first login.`;
+    const credentials = `KMPDU Membership Credentials\n\nMembership Number: ${formData.memberId}\nTemporary Password: ${generatedPassword}\n\nPlease change your password after first login.`;
     navigator.clipboard.writeText(credentials);
     toast.info("All Credentials Copied to clipboard.");
   };
@@ -197,6 +191,7 @@ export default function AdminUsers() {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.memberId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.nationalId.includes(searchQuery) ||
       user.phone.includes(searchQuery);
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     const matchesBranch = branchFilter === 'all' || user.branch === branchFilter;
@@ -219,10 +214,10 @@ export default function AdminUsers() {
       id: Date.now().toString(),
       type: 'member',
       name: formData.name,
-      email: formData.email,
+      memberId: formData.memberId,
+      nationalId: formData.nationalId,
       phone: formData.phone,
       branch: formData.branch,
-      memberId: generatedMemberId,
       status: 'pending',
       createdAt: new Date(),
     };
@@ -236,9 +231,10 @@ export default function AdminUsers() {
     // Add user with pending status
     const newUser: SystemUser = {
       id: registration.id,
-      memberId: registration.memberId || generatedMemberId,
+
+      memberId: registration.memberId,
+      nationalId: registration.nationalId,
       name: registration.name,
-      email: registration.email,
       phone: registration.phone,
       branch: registration.branch,
       status: 'pending',
@@ -294,13 +290,13 @@ export default function AdminUsers() {
   const resetForm = () => {
     setFormData({
       name: '',
-      email: '',
+      memberId: '',
+      nationalId: '',
       phone: '',
       branch: '',
       status: 'pending',
     });
     setGeneratedPassword('');
-    setGeneratedMemberId('');
     setShowPassword(false);
     setIsAddDialogOpen(false);
     setPendingRegistration(null);
@@ -308,7 +304,6 @@ export default function AdminUsers() {
 
   const openAddDialog = () => {
     resetForm();
-    generateMemberId();
     generatePassword();
     setIsAddDialogOpen(true);
   };
@@ -317,7 +312,8 @@ export default function AdminUsers() {
     setSelectedUser(user);
     setFormData({
       name: user.name,
-      email: user.email,
+      memberId: user.memberId,
+      nationalId: user.nationalId,
       phone: user.phone,
       branch: user.branch,
       status: user.status,
@@ -497,7 +493,8 @@ export default function AdminUsers() {
                     </TableHead>
                     <TableHead className="px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Member</TableHead>
                     <TableHead className="px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Membership No.</TableHead>
-                    <TableHead className="hidden md:table-cell px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Phone</TableHead>
+                    <TableHead className="px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">National ID</TableHead>
+                    <TableHead className="hidden md:table-cell px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Mobile Number</TableHead>
                     <TableHead className="hidden lg:table-cell px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Branch</TableHead>
                     <TableHead className="px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Status</TableHead>
                     <TableHead className="hidden lg:table-cell px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">Last Login</TableHead>
@@ -530,7 +527,6 @@ export default function AdminUsers() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium text-foreground text-[10px] xs:text-xs sm:text-sm truncate">{user.name}</p>
-                              <p className="text-[8px] sm:text-xs text-muted-foreground truncate">{user.email}</p>
                             </div>
                           </div>
                         </TableCell>
@@ -538,6 +534,9 @@ export default function AdminUsers() {
                           <code className="text-[9px] sm:text-sm font-mono bg-muted px-1 sm:px-2 py-0.5 sm:py-1 rounded">
                             {user.memberId}
                           </code>
+                        </TableCell>
+                        <TableCell className="px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">
+                          {user.nationalId}
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-muted-foreground px-2 sm:px-4 text-[10px] xs:text-xs sm:text-sm">
                           {user.phone}
@@ -593,7 +592,7 @@ export default function AdminUsers() {
             <DialogHeader className="pr-10 px-6 pt-6">
               <DialogTitle>Add New Member</DialogTitle>
               <DialogDescription>
-                Create a new KMPDU member account. Login credentials will be generated automatically.
+                Create a new KMPDU member account. Enter member details and share generated credentials.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4 px-6 overflow-y-auto flex-1">
@@ -609,18 +608,29 @@ export default function AdminUsers() {
               </div>
               <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="text-sm"
-                  />
+                    <Label htmlFor="memberId">Member ID</Label>
+                    <Input
+                        id="memberId"
+                        placeholder="KMPDU-XXXX-XXXXX"
+                        value={formData.memberId}
+                        onChange={(e) => setFormData({ ...formData, memberId: e.target.value })}
+                        className="text-sm"
+                    />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="nationalId">National ID</Label>
+                    <Input
+                        id="nationalId"
+                        placeholder="12345678"
+                        value={formData.nationalId}
+                        onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                        className="text-sm"
+                    />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Mobile Number</Label>
                   <Input
                     id="phone"
                     placeholder="+254 7XX XXX XXX"
@@ -666,31 +676,7 @@ export default function AdminUsers() {
                 </div>
                 
                 <div className="space-y-3">
-                  {/* Membership Number */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <IdCard className="h-3.5 w-3.5" />
-                      <span>Membership Number</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 px-3 py-2 rounded bg-background font-mono text-sm border border-border">
-                        {generatedMemberId}
-                      </code>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => copyToClipboard(generatedMemberId, 'memberId')}
-                        className="shrink-0"
-                      >
-                        {copiedCredentials === 'memberId' ? (
-                          <Check className="h-4 w-4 text-success" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+
                   
                   {/* Password */}
                   <div className="space-y-1.5">
@@ -749,7 +735,7 @@ export default function AdminUsers() {
               </Button>
               <Button 
                 onClick={handleAddUser} 
-                disabled={!formData.name || !formData.branch}
+                disabled={!formData.name || !formData.branch || !formData.memberId || !formData.nationalId}
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Create Member
@@ -787,16 +773,15 @@ export default function AdminUsers() {
               </div>
               <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="edit-email">Email</Label>
+                  <Label htmlFor="edit-nationalId">National ID</Label>
                   <Input
-                    id="edit-email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    id="edit-nationalId"
+                    value={formData.nationalId}
+                    onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="edit-phone">Phone</Label>
+                  <Label htmlFor="edit-phone">Mobile Number</Label>
                   <Input
                     id="edit-phone"
                     value={formData.phone}
