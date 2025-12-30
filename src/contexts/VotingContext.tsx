@@ -274,20 +274,23 @@ export function VotingProvider({ children }: { children: ReactNode }) {
          };
 
          // Update local state and storage
-          const newVotedPositions = {
-            ...userVotedPositions,
-            [positionId]: true,
-          };
-          setUserVotedPositions(newVotedPositions);
-          
-          if (user?.memberId) {
-            const storageKey = `kmpdu_vote_history_${user.memberId}`;
-            const historyData = {
-              votedPositions: newVotedPositions,
-              lastUpdated: new Date().toISOString(),
+          setUserVotedPositions((prev) => {
+            const newVotedPositions = {
+              ...prev,
+              [positionId]: true,
             };
-            localStorage.setItem(storageKey, JSON.stringify(historyData));
-          }
+            
+            if (user?.memberId) {
+              const storageKey = `kmpdu_vote_history_${user.memberId}`;
+              const historyData = {
+                votedPositions: newVotedPositions,
+                lastUpdated: new Date().toISOString(),
+              };
+              localStorage.setItem(storageKey, JSON.stringify(historyData));
+            }
+            
+            return newVotedPositions;
+          });
 
           setVoteReceipts((prev) => [...prev, receipt]);
           
